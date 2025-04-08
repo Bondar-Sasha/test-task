@@ -1,0 +1,76 @@
+version: '3.8'
+
+networks:
+  express-network:
+    driver: bridge
+  nest-network:
+    driver: bridge
+
+services:
+  mongoDB:
+    build:
+      context: ./microservices/mongoDB
+      dockerfile: Dockerfile
+    networks:
+      - express-network
+      - nest-network
+    volumes:
+      - type: volume
+        source: mongoDB-data
+  redis:
+    build:
+      context: ./microservices/redis
+      dockerfile: Dockerfile
+    environment:
+      REDIS_USER: ${REDIS_USER}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+    networks:
+      - nest-network
+    volumes:
+      - type: volume
+        source: redis-data
+  postgres:
+    build:
+      context: ./microservices/postgres
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    networks:
+      - express-network
+      - nest-network
+    volumes:
+      - type: volume
+        source: postgres-data
+
+  express:
+    build:
+      context: ./microservices/express
+      dockerfile: Dockerfile
+    depends_on:
+      - mongoDB
+      - postgres
+    networks:
+       - express-network
+  nest:
+    build:
+      context: ./microservices/nest
+      dockerfile: Dockerfile
+    depends_on:
+      - mongoDB
+      - postgres
+    networks:
+       - nest-network
+      
+env_file:
+  - .env
+
+volumes:
+  postgres-data:
+    external: true
+  mongoDB-data:
+    external: true
+  redis-data:
+    external: true
+

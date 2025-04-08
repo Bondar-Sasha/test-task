@@ -1,0 +1,10 @@
+{
+  "name": "test_task",
+  "version": "1.0.0",
+  "description": "monorepo",
+  "keywords": [],
+  "license": "ISC",
+  "workspaces":[
+    "microservices/*"
+  ]
+}
