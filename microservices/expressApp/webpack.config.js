@@ -1,4 +1,4 @@
-import { resolve } from "path";
+import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -9,7 +9,7 @@ export default {
   entry: './src/index.js',
   target: 'node',
   output: {
-    filename: 'index.js',
+    filename: 'index.mjs',
     path: resolve(__dirname, 'dist'),
     clean: true,
     library: {
@@ -36,11 +36,6 @@ export default {
       },
     ],
   },
-  externalsPresets: { node: true },
-  // externals: [
-  //   '@grpc/grpc-js',
-  //   'dotenv',
-  //   'shared-for-store',
-  //   'proto-for-store',
-  // ],
+
+  externals: ['prisma', '@prisma/client', 'dotenv'],
 };

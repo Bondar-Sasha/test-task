@@ -1,76 +1,71 @@
-version: '3.8'
-
 networks:
   express-network:
     driver: bridge
   nest-network:
     driver: bridge
 
+
 services:
-  mongoDB:
-    build:
-      context: ./microservices/mongoDB
-      dockerfile: Dockerfile
-    networks:
-      - express-network
-      - nest-network
-    volumes:
-      - type: volume
-        source: mongoDB-data
-  redis:
-    build:
-      context: ./microservices/redis
-      dockerfile: Dockerfile
-    environment:
-      REDIS_USER: ${REDIS_USER}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-    networks:
-      - nest-network
-    volumes:
-      - type: volume
-        source: redis-data
+  # mongo-db:
+  #   build:
+  #     context: ./microservices/mongo-db
+  #     dockerfile: Dockerfile
+  #   networks:
+  #     - express-network
+  #     - nest-network
+  #   volumes:
+  #     - mongo-db-data:/data/db
+  #   env_file:
+  #     - ./.env
+  # redis:
+  #   build:
+  #     context: ./microservices/redis
+  #     dockerfile: Dockerfile
+  #   environment:
+  #     REDIS_USER: ${REDIS_USER}
+  #     REDIS_PASSWORD: ${REDIS_PASSWORD}
+  #   networks:
+  #     - nest-network
+  #   volumes:
+  #     - redis-data:/data
+  #   env_file:
+  #     - ./.env 
   postgres:
     build:
       context: ./microservices/postgres
       dockerfile: Dockerfile
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+
     networks:
       - express-network
-      - nest-network
     volumes:
-      - type: volume
-        source: postgres-data
+      - postgres-data:/var/lib/postgresql/data
+    env_file:
+      - ./.env
 
   express:
     build:
-      context: ./microservices/express
+      context: ./microservices/expressApp
       dockerfile: Dockerfile
+
     depends_on:
-      - mongoDB
       - postgres
     networks:
        - express-network
-  nest:
-    build:
-      context: ./microservices/nest
-      dockerfile: Dockerfile
-    depends_on:
-      - mongoDB
-      - postgres
-    networks:
-       - nest-network
+    env_file:
+      - ./.env
+  # nest:
+  #   build:
+  #     context: ./microservices/nest
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     - mongo-db
+  #     - postgres
+  #   networks:
+  #      - nest-network
       
-env_file:
-  - .env
+
 
 volumes:
   postgres-data:
-    external: true
-  mongoDB-data:
-    external: true
-  redis-data:
-    external: true
-
+  # mongo-db-data:
+  # redis-data:

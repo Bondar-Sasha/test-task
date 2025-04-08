@@ -1,4 +1,4 @@
-FROM redis:slim
+FROM redis
 
 WORKDIR /data
 
