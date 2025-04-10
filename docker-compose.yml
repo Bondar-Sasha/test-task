@@ -4,39 +4,34 @@ networks:
   nest-network:
     driver: bridge
 
-
 services:
-  # mongo-db:
-  #   build:
-  #     context: ./microservices/mongo-db
-  #     dockerfile: Dockerfile
-  #   networks:
-  #     - express-network
-  #     - nest-network
-  #   volumes:
-  #     - mongo-db-data:/data/db
-  #   env_file:
-  #     - ./.env
-  # redis:
-  #   build:
-  #     context: ./microservices/redis
-  #     dockerfile: Dockerfile
-  #   environment:
-  #     REDIS_USER: ${REDIS_USER}
-  #     REDIS_PASSWORD: ${REDIS_PASSWORD}
-  #   networks:
-  #     - nest-network
-  #   volumes:
-  #     - redis-data:/data
-  #   env_file:
-  #     - ./.env 
+  mongo-db:
+    build:
+      context: ./microservices/mongo-db
+      dockerfile: Dockerfile
+    networks:
+      - nest-network
+    volumes:
+      - mongo-db-data:/data/db
+    env_file:
+      - ./.env
+  redis:
+    build:
+      context: ./microservices/redis
+      dockerfile: Dockerfile
+    networks:
+      - nest-network
+    volumes:
+      - redis-data:/data
+    env_file:
+      - ./.env
   postgres:
     build:
       context: ./microservices/postgres
       dockerfile: Dockerfile
 
     networks:
-      - express-network
+      - nest-network
     volumes:
       - postgres-data:/var/lib/postgresql/data
     env_file:
@@ -46,26 +41,27 @@ services:
     build:
       context: ./microservices/expressApp
       dockerfile: Dockerfile
-
     depends_on:
-      - postgres
+      - nest
     networks:
        - express-network
     env_file:
       - ./.env
-  # nest:
-  #   build:
-  #     context: ./microservices/nest
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     - mongo-db
-  #     - postgres
-  #   networks:
-  #      - nest-network
-      
+  nest:
+    build:
+      context: ./microservices/nestApp
+      dockerfile: Dockerfile
 
+    depends_on:
+      - redis
+      - mongo-db
+      - postgres
+    networks:
+       - nest-network
+    env_file:
+      - ./.env 
 
 volumes:
   postgres-data:
-  # mongo-db-data:
-  # redis-data:
+  mongo-db-data:
+  redis-data:

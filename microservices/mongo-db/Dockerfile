@@ -1,13 +1,5 @@
-FROM redis
+FROM mongo
 
-WORKDIR /data
+EXPOSE $MONGO_PORT
 
-ARG REDIS_USER
-ARG REDIS_PASSWORD
-
-ENV REDIS_USER=${REDIS_USER}
-ENV REDIS_PASSWORD=${REDIS_PASSWORD}
-
-EXPOSE 6379
-
-CMD ["redis-server"]
+CMD ["mongod", "--auth", "--quiet"]

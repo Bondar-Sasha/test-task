@@ -1,7 +1,5 @@
-FROM postgres
+FROM postgres:17-alpine
 
-ENV POSTGRES_HOST_AUTH_METHOD=md5
-
-EXPOSE 5432
+EXPOSE $POSTGRES_PORT
 
 CMD ["postgres"]
