@@ -1,11 +1,12 @@
 FROM node:18-alpine AS builder
 
 WORKDIR /app
+VOLUME /root/.npm
 
 COPY package.json tsconfig.json ./
 COPY src ./src                    
 
-RUN npm i
+RUN npm i --cache /root/.npm
 
 RUN npm run build
 

@@ -11,6 +11,8 @@ services:
       dockerfile: Dockerfile
     networks:
       - nest-network
+    # ports:
+    #   - 27017:27017
     volumes:
       - mongo-db-data:/data/db
     env_file:
@@ -21,6 +23,8 @@ services:
       dockerfile: Dockerfile
     networks:
       - nest-network
+    # ports:
+    #   - 6379:6379
     volumes:
       - redis-data:/data
     env_file:
@@ -31,25 +35,31 @@ services:
       dockerfile: Dockerfile
     networks:
       - nest-network
+    # ports:
+    #   - 5432:5432
     volumes:
       - postgres-data:/var/lib/postgresql/data
     env_file:
       - ./.env
 
-  express:
-    build:
-      context: ./microservices/expressApp
-      dockerfile: Dockerfile
-    depends_on:
-      - nest
-    networks:
-       - express-network
-    env_file:
-      - ./.env
+  # express:
+  #   build:
+  #     context: ./microservices/expressApp
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     - nest
+  #   volumes:
+  #     - npm-cache:/root/.npm
+  #   networks:
+  #      - express-network
+  #   env_file:
+  #     - ./.env
   nest:
     build:
       context: ./microservices/nest-app
       dockerfile: Dockerfile
+    volumes:
+      - npm-cache:/root/.npm
 
     depends_on:
       - redis
@@ -64,3 +74,5 @@ volumes:
   postgres-data:
   mongo-db-data:
   redis-data:
+  npm-cache:
+    external: false

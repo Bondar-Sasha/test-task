@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit, OnModuleDestroy, InternalServerErrorException } from '@nestjs/common'
+import { Injectable, OnModuleDestroy, InternalServerErrorException, OnModuleInit } from '@nestjs/common'
 import { Redis } from 'ioredis'
 
 import { EnvService } from '../../../cfg'
@@ -9,11 +9,8 @@ export class ConnectionService implements OnModuleInit, OnModuleDestroy {
 
    constructor(private readonly envService: EnvService) {}
 
-   async onModuleInit() {
+   onModuleInit() {
       try {
-         if (this.redisClient.status === 'ready') {
-            return
-         }
          const { REDIS_USER, REDIS_PASSWORD, REDIS_PORT, REDIS_HOST, REDIS_DB_NUM } =
             this.envService.getRedisCredentials()
 
@@ -24,7 +21,6 @@ export class ConnectionService implements OnModuleInit, OnModuleDestroy {
             password: REDIS_PASSWORD,
             db: REDIS_DB_NUM,
          })
-         await this.redisClient.connect()
 
          console.log('nest -> redis')
       } catch (error) {
