@@ -1,4 +1,7 @@
 import { NestFactory } from '@nestjs/core'
+import { config } from 'dotenv'
+import { resolve } from 'path'
+config({ path: resolve(process.cwd(), '../../.env') })
 
 import { AppModule } from './app.module'
 import { EnvService } from './cfg'

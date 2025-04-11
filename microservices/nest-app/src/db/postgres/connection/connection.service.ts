@@ -10,9 +10,6 @@ export class ConnectionService implements OnModuleDestroy, OnModuleInit {
    constructor(private readonly envService: EnvService) {}
 
    async onModuleInit() {
-      if (this.postgresClient.isInitialized) {
-         return
-      }
       const APP_MODE = this.envService.getAppMode()
 
       const { POSTGRES_DB, POSTGRES_HOST, POSTGRES_PASSWORD, POSTGRES_PORT, POSTGRES_USER } =
@@ -45,7 +42,7 @@ export class ConnectionService implements OnModuleDestroy, OnModuleInit {
       }
    }
 
-   getClient(): DataSource {
+   getClient() {
       return this.postgresClient
    }
 }
