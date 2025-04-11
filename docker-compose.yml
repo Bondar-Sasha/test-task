@@ -29,7 +29,6 @@ services:
     build:
       context: ./microservices/postgres
       dockerfile: Dockerfile
-
     networks:
       - nest-network
     volumes:
@@ -49,7 +48,7 @@ services:
       - ./.env
   nest:
     build:
-      context: ./microservices/nestApp
+      context: ./microservices/nest-app
       dockerfile: Dockerfile
 
     depends_on:
