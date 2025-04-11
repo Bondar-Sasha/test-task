@@ -27,6 +27,10 @@ export default tseslint.config(
    },
    {
       rules: {
+         'no-console': ['error', { allow: ['warn', 'error'] }],
+         'spaced-comment': ['error', 'always'],
+         'multiline-comment-style': ['error', 'starred-block'],
+         'capitalized-comments': ['error', 'always'],
          'prettier/prettier': ['off', { endOfLine: 'auto' }],
          '@typescript-eslint/no-explicit-any': 'off',
          '@typescript-eslint/no-floating-promises': 'warn',

@@ -42,18 +42,18 @@ services:
     env_file:
       - ./.env
 
-  # express:
-  #   build:
-  #     context: ./microservices/expressApp
-  #     dockerfile: Dockerfile
-  #   depends_on:
-  #     - nest
-  #   volumes:
-  #     - npm-cache:/root/.npm
-  #   networks:
-  #      - express-network
-  #   env_file:
-  #     - ./.env
+  express:
+    build:
+      context: ./microservices/expressApp
+      dockerfile: Dockerfile
+    depends_on:
+      - nest
+    volumes:
+      - npm-cache:/root/.npm
+    networks:
+       - express-network
+    env_file:
+      - ./.env
   nest:
     build:
       context: ./microservices/nest-app
