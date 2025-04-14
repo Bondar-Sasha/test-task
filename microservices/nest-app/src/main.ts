@@ -1,9 +1,11 @@
 import { NestFactory } from '@nestjs/core'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { MicroserviceOptions, Transport } from '@nestjs/microservices'
+import { Logger } from '@nestjs/common'
 
 import { AppModule } from './app.module'
 import { EnvService } from '@cfg'
+import { HttpExceptionFilter } from '@utils'
 
 async function bootstrap() {
    const app = await NestFactory.create(AppModule)
@@ -17,6 +19,9 @@ async function bootstrap() {
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
       credentials: true,
    })
+   const logger = new Logger()
+
+   app.useGlobalFilters(new HttpExceptionFilter(logger))
 
    app.connectMicroservice<MicroserviceOptions>({
       transport: Transport.REDIS,
