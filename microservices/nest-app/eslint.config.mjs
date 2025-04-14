@@ -27,6 +27,9 @@ export default tseslint.config(
    },
    {
       rules: {
+         '@typescript-eslint/no-unsafe-call': 'off',
+         '@typescript-eslint/no-unsafe-member-access': 'off',
+         '@typescript-eslint/no-unsafe-assignment': 'off',
          'no-console': ['error', { allow: ['warn', 'error'] }],
          'spaced-comment': ['error', 'always'],
          'multiline-comment-style': ['error', 'starred-block'],

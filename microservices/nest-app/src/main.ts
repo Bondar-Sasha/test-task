@@ -1,16 +1,44 @@
 import { NestFactory } from '@nestjs/core'
-import { config } from 'dotenv'
-import { resolve } from 'path'
-config({ path: resolve(process.cwd(), '../../.env') })
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
+import { MicroserviceOptions, Transport } from '@nestjs/microservices'
 
 import { AppModule } from './app.module'
-import { EnvService } from './cfg'
+import { EnvService } from '@cfg'
 
 async function bootstrap() {
    const app = await NestFactory.create(AppModule)
 
    const envService = app.get(EnvService)
 
-   await app.listen(envService.getAppPort())
+   const { REDIS_USERNAME, REDIS_PASSWORD, REDIS_PORT, REDIS_HOST, REDIS_DB_NUM } = envService.getRedisCredentials()
+
+   app.enableCors({
+      origin: [envService.getClientUrl()],
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      credentials: true,
+   })
+
+   app.connectMicroservice<MicroserviceOptions>({
+      transport: Transport.REDIS,
+      options: {
+         host: REDIS_HOST,
+         port: REDIS_PORT,
+         username: REDIS_USERNAME,
+         password: REDIS_PASSWORD,
+         db: REDIS_DB_NUM,
+      },
+   })
+
+   const config = new DocumentBuilder()
+      .setTitle('App')
+      .setDescription('API description')
+      .setVersion('1.0')
+      .addTag('))')
+      .build()
+
+   const documentFactory = () => SwaggerModule.createDocument(app, config)
+   SwaggerModule.setup('api', app, documentFactory)
+
+   await Promise.all([app.startAllMicroservices(), app.listen(envService.getAppPort())])
 }
 void bootstrap()
