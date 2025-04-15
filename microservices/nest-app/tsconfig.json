@@ -22,5 +22,8 @@
       "strictBindCallApply": false,
       "noFallthroughCasesInSwitch": false,
       "composite": true
-   }
+   },
+   "include": ["src/**/*"],
+   "exclude": ["node_modules", "**/*.spec.ts"],
+   "references": [{ "path": "../../types/tsconfig.json" }]
 }

@@ -7,6 +7,6 @@
    "license": "ISC",
    "workspaces": [
       "microservices/*",
-      "types/*"
+      "types"
    ]
 }

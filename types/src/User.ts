@@ -1,4 +1,4 @@
-namespace User {
+export namespace User {
    export interface UserForRegistration {
       name: string
       email: string
