@@ -9,9 +9,10 @@
       "target": "ES2023",
       "sourceMap": true,
       "outDir": "./dist",
-      "baseUrl": "./",
+      "baseUrl": "src",
       "paths": {
-         "@cfg": ["src/cfg/index.ts"]
+         "@cfg": ["cfg/index"],
+         "@utils": ["utils/index"]
       },
       "incremental": true,
       "skipLibCheck": true,
@@ -19,6 +20,10 @@
       "forceConsistentCasingInFileNames": true,
       "noImplicitAny": false,
       "strictBindCallApply": false,
-      "noFallthroughCasesInSwitch": false
-   }
+      "noFallthroughCasesInSwitch": false,
+      "composite": true
+   },
+   "include": ["src/**/*"],
+   "exclude": ["node_modules", "**/*.spec.ts"],
+   "references": [{ "path": "../../types/tsconfig.json" }]
 }

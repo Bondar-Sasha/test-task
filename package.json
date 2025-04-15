@@ -6,6 +6,7 @@
    "keywords": [],
    "license": "ISC",
    "workspaces": [
-      "microservices/*"
+      "microservices/*",
+      "types"
    ]
 }

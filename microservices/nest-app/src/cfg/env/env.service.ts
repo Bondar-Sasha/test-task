@@ -1,103 +1,52 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 
-type AppMode = 'development' | 'production'
-
-const [POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB, POSTGRES_HOST, POSTGRES_PORT] = [
-   process.env.POSTGRES_USER,
-   process.env.POSTGRES_PASSWORD,
-   process.env.POSTGRES_DB,
-   process.env.POSTGRES_HOST,
-   process.env.POSTGRES_PORT,
-]
-
-const [REDIS_HOST, REDIS_USER, REDIS_PORT, REDIS_PASSWORD, REDIS_DB_NUM] = [
-   process.env.REDIS_HOST,
-   process.env.REDIS_USER,
-   process.env.REDIS_PORT,
-   process.env.REDIS_PASSWORD,
-   process.env.REDIS_DB_NUM,
-]
-
-const [MONGO_INITDB_ROOT_USERNAME, MONGO_INITDB_ROOT_PASSWORD, MONGO_INITDB_DATABASE, MONGO_HOST, MONGO_PORT] = [
-   process.env.MONGO_INITDB_ROOT_USERNAME,
-   process.env.MONGO_INITDB_ROOT_PASSWORD,
-   process.env.MONGO_INITDB_DATABASE,
-   process.env.MONGO_HOST,
-   process.env.MONGO_PORT,
-]
+export type AppMode = 'development' | 'production'
 
 @Injectable()
 export class EnvService {
-   getAppMode(): AppMode {
-      const APP_MODE = process.env.APP_MODE as AppMode
+   constructor(private configService: ConfigService) {}
 
-      if (!APP_MODE) {
-         throw new NotFoundException('APP_MODE is not defined')
-      }
-      return APP_MODE
+   getClientUrl() {
+      return this.configService.get<string>('CLIENT_URL')
+   }
+
+   getAppMode(): AppMode {
+      return this.configService.get<AppMode>('APP_MODE')!
    }
 
    getAppPort(): number {
-      const APP_PORT = process.env.NEST_APP_PORT
-
-      if (!Number.isInteger(Number(APP_PORT))) {
-         throw new BadRequestException('APP_PORT is not a number')
-      }
-
-      return Number(APP_PORT)
+      return this.configService.get<number>('NEST_APP_PORT')!
    }
+
    getPostgresCredentials() {
-      if (!POSTGRES_USER || !POSTGRES_PASSWORD || !POSTGRES_DB || !POSTGRES_HOST || !POSTGRES_PORT) {
-         throw new NotFoundException('POSTGRES credentials are not defined')
-      }
-      if (!Number.isInteger(Number(POSTGRES_PORT))) {
-         throw new BadRequestException('POSTGRES_PORT is not a number')
-      }
-
       return {
-         POSTGRES_USER,
-         POSTGRES_PASSWORD,
-         POSTGRES_DB,
-         POSTGRES_HOST: this.getAppMode() === 'development' ? 'localhost' : POSTGRES_HOST,
-         POSTGRES_PORT: Number(POSTGRES_PORT),
+         POSTGRES_USER: this.configService.get<string>('POSTGRES_USER'),
+         POSTGRES_PASSWORD: this.configService.get<string>('POSTGRES_PASSWORD'),
+         POSTGRES_DB: this.configService.get<string>('POSTGRES_DB'),
+         POSTGRES_HOST:
+            this.getAppMode() === 'development' ? 'localhost' : this.configService.get<string>('POSTGRES_HOST'),
+         POSTGRES_PORT: this.configService.get<number>('POSTGRES_PORT'),
       }
    }
+
    getRedisCredentials() {
-      if (!REDIS_HOST || !REDIS_USER || !REDIS_PORT || !REDIS_PASSWORD || !REDIS_DB_NUM) {
-         throw new NotFoundException('REDIS credentials are not defined')
-      }
-      if (!Number.isInteger(Number(REDIS_PORT)) || !Number.isInteger(Number(REDIS_DB_NUM))) {
-         throw new BadRequestException('REDIS_PORT or REDIS_DB_NUM is not a number')
-      }
-
       return {
-         REDIS_USER,
-         REDIS_PASSWORD,
-         REDIS_HOST: this.getAppMode() === 'development' ? 'localhost' : REDIS_HOST,
-         REDIS_PORT: Number(REDIS_PORT),
-         REDIS_DB_NUM: Number(REDIS_DB_NUM),
+         REDIS_USERNAME: this.configService.get<string>('REDIS_USERNAME'),
+         REDIS_PASSWORD: this.configService.get<string>('REDIS_PASSWORD'),
+         REDIS_HOST: this.getAppMode() === 'development' ? 'localhost' : this.configService.get<string>('REDIS_HOST'),
+         REDIS_PORT: this.configService.get<number>('REDIS_PORT'),
+         REDIS_DB_NUM: this.configService.get<number>('REDIS_DB_NUM'),
       }
    }
-   getMongoCredentials() {
-      if (
-         !MONGO_INITDB_ROOT_USERNAME ||
-         !MONGO_INITDB_ROOT_PASSWORD ||
-         !MONGO_INITDB_DATABASE ||
-         !MONGO_HOST ||
-         !MONGO_PORT
-      ) {
-         throw new NotFoundException('MONGO credentials are not defined')
-      }
-      if (!Number.isInteger(Number(MONGO_PORT))) {
-         throw new BadRequestException('MONGO_PORT is not a number')
-      }
 
+   getMongoCredentials() {
       return {
-         MONGO_INITDB_ROOT_USERNAME,
-         MONGO_INITDB_ROOT_PASSWORD,
-         MONGO_INITDB_DATABASE,
-         MONGO_HOST: this.getAppMode() === 'development' ? 'localhost' : MONGO_HOST,
-         MONGO_PORT: Number(MONGO_PORT),
+         MONGO_INITDB_ROOT_USERNAME: this.configService.get<string>('MONGO_INITDB_ROOT_USERNAME'),
+         MONGO_INITDB_ROOT_PASSWORD: this.configService.get<string>('MONGO_INITDB_ROOT_PASSWORD'),
+         MONGO_INITDB_DATABASE: this.configService.get<string>('MONGO_INITDB_DATABASE'),
+         MONGO_HOST: this.getAppMode() === 'development' ? 'localhost' : this.configService.get<string>('MONGO_HOST'),
+         MONGO_PORT: this.configService.get<number>('MONGO_PORT'),
       }
    }
 }
