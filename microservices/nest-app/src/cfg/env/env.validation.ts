@@ -1,5 +1,5 @@
 import { plainToInstance } from 'class-transformer'
-import { IsIn, IsNumber, IsOptional, IsString, validateSync } from 'class-validator'
+import { IsIn, IsNotEmpty, IsNumber, IsOptional, IsString, validateSync } from 'class-validator'
 
 import { AppMode } from './env.service'
 
@@ -7,6 +7,10 @@ class EnvironmentVariables {
    @IsOptional()
    @IsString()
    CLIENT_URL: string
+
+   @IsOptional()
+   @IsString()
+   JWT_SECRET: string
 
    @IsString()
    @IsIn(['development', 'production'])
@@ -43,7 +47,7 @@ class EnvironmentVariables {
    REDIS_PASSWORD: string
 
    @IsNumber()
-   REDIS_DB_NUM: number
+   REDIS_AUTH_DB: number
 
    @IsString()
    MONGO_INITDB_ROOT_USERNAME: string
@@ -59,6 +63,18 @@ class EnvironmentVariables {
 
    @IsNumber()
    MONGO_PORT: number
+
+   @IsNotEmpty()
+   EMAIL_HOST: string
+
+   @IsNumber()
+   EMAIL_PORT: number
+
+   @IsNotEmpty()
+   EMAIL_USER: string
+
+   @IsNotEmpty()
+   EMAIL_PASSWORD: string
 }
 
 export function validate(config: Record<string, unknown>) {

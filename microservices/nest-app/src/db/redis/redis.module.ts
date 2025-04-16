@@ -1,26 +1,19 @@
 import { Module } from '@nestjs/common'
-import { ClientsModule, Transport } from '@nestjs/microservices'
+import { ClientsModule } from '@nestjs/microservices'
 
-import { ConnectionService } from './connection/connection.service'
 import { EnvService } from '@cfg'
 
 @Module({
    imports: [
       ClientsModule.registerAsync([
          {
-            name: 'REDIS_SERVICE',
+            name: 'REDIS_AUTH_SERVICE',
             useFactory: (envService: EnvService) => {
-               const { REDIS_HOST, REDIS_PORT, REDIS_USERNAME, REDIS_PASSWORD, REDIS_DB_NUM } =
-                  envService.getRedisCredentials()
-
+               const { REDIS_AUTH_DB } = envService.getRedisCredentials()
                return {
-                  transport: Transport.REDIS,
                   options: {
-                     host: REDIS_HOST,
-                     port: Number(REDIS_PORT),
-                     username: REDIS_USERNAME,
-                     password: REDIS_PASSWORD,
-                     db: Number(REDIS_DB_NUM),
+                     db: REDIS_AUTH_DB,
+                     ttl: 180,
                   },
                }
             },
@@ -28,7 +21,6 @@ import { EnvService } from '@cfg'
          },
       ]),
    ],
-   providers: [ConnectionService],
    exports: [ClientsModule],
 })
 export class RedisModule {}

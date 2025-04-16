@@ -6,6 +6,9 @@ export type AppMode = 'development' | 'production'
 @Injectable()
 export class EnvService {
    constructor(private configService: ConfigService) {}
+   getJwtSecret() {
+      return this.configService.get<string>('JWT_SECRET')
+   }
 
    getClientUrl() {
       return this.configService.get<string>('CLIENT_URL')
@@ -36,7 +39,15 @@ export class EnvService {
          REDIS_PASSWORD: this.configService.get<string>('REDIS_PASSWORD'),
          REDIS_HOST: this.getAppMode() === 'development' ? 'localhost' : this.configService.get<string>('REDIS_HOST'),
          REDIS_PORT: this.configService.get<number>('REDIS_PORT'),
-         REDIS_DB_NUM: this.configService.get<number>('REDIS_DB_NUM'),
+         REDIS_AUTH_DB: this.configService.get<number>('REDIS_AUTH_DB'),
+      }
+   }
+   getEmailNotificationsCredentials() {
+      return {
+         EMAIL_HOST: this.configService.get<string>('EMAIL_HOST'),
+         EMAIL_PORT: this.configService.get<number>('EMAIL_PORT'),
+         EMAIL_USER: this.configService.get<string>('EMAIL_USER'),
+         EMAIL_PASSWORD: this.configService.get<string>('EMAIL_PASSWORD'),
       }
    }
 
