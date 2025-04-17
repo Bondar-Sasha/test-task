@@ -22,9 +22,10 @@ export class BasicAuthController {
    ): Promise<RegistrationAttemptResponse> {
       return await this.basicAuthService.registrationAttempt(registrationData)
    }
+
    // @Post(registrationCommitRoute())
    // async registrationCommit(@Body() registrationData: CommitRegistrationRequest): Promise<CommitRegistrationResponse> {
-   //    return await this.basicAuthService.registrationCommit(registrationData)
+   //    // return await this.basicAuthService.registrationCommit(registrationData)
    // }
 
    @Patch(loginRoute)

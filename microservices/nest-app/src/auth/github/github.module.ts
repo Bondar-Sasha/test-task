@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module } from '@nestjs/common'
+import { GithubAuthController } from './github-auth/github-auth.controller'
+import { GithubAuthService } from './github-auth/github-auth/github-auth.strategy'
 
-@Module({})
+@Module({
+   controllers: [GithubAuthController],
+   providers: [GithubAuthService],
+})
 export class GithubModule {}

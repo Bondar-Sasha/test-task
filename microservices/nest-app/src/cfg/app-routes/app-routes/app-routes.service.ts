@@ -9,6 +9,14 @@ export class AppRoutesService {
          registrationCommitRoute: (url?: string) => `/registration/commit/${url || ':urlForCode'}`,
          loginRoute: '/login',
          logoutRoute: '/logout',
+
+         githubRegisterRoute: '/github/registration',
+         githubLoginRoute: '/github/login',
+         githubCallbackRoute: '/github/callback',
+
+         googleRegisterRoute: '/google/registration',
+         googleLoginRoute: '/google/login',
+         googleCallbackRoute: '/google/callback',
       }
    }
 }

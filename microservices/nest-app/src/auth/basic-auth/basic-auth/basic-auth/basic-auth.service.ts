@@ -1,5 +1,5 @@
 import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common'
-import { ClientProxy } from '@nestjs/microservices'
+import { Redis } from 'ioredis'
 
 import { AppRoutesService } from '@cfg'
 import { AuthTypes } from '@test_task/types'
@@ -9,7 +9,7 @@ import { EmailNotificationService } from 'email-notification/email-notification/
 @Injectable()
 export class BasicAuthService {
    constructor(
-      @Inject('REDIS_AUTH_SERVICE') private readonly redisAuthClient: ClientProxy,
+      @Inject('REDIS_AUTH_SERVICE') private readonly redisAuthClient: Redis,
       private readonly tokensService: TokensService,
       private readonly emailNotificationService: EmailNotificationService,
    ) {}
@@ -21,19 +21,20 @@ export class BasicAuthService {
          const generatedCode = this.tokensService.generateCode()
          const generatedChuckOfUrl = this.tokensService.getUniqueStr('')
 
-         await this.emailNotificationService.sendMail(
-            userData.email,
-            'Confirm your email',
-            `Your code: ${generatedCode}`,
-         )
-
-         this.redisAuthClient.emit(generatedChuckOfUrl, JSON.stringify({ ...userData, code: generatedCode }))
-
+         // Сначала отправляем данные в Redis
+         await Promise.all([
+            // this.emailNotificationService.sendMail(userData.email, 'Confirm your email', `Your code: ${generatedCode}`),
+            // this.redisAuthClient.set(generatedChuckOfUrl, JSON.stringify({ ...userData, code: generatedCode })),
+         ])
+         console.log(Object.keys(this.redisAuthClient))
          return { confirmEmailUrl: 'http://localhost:3001/api/auth/registration/commit/' + generatedChuckOfUrl }
       } catch (error) {
          console.log(error)
          throw new InternalServerErrorException(error, 'Mail sending error')
       }
    }
-   // registrationCommit(userData: AuthTypes.CommitRegistrationRequest): AuthTypes.CommitRegistrationResponse {}
+   // registrationCommit(userData: AuthTypes.CommitRegistrationRequest): AuthTypes.CommitRegistrationResponse {
+   //    this.redisAuthClient.set(("")=>{})
+
+   // }
 }

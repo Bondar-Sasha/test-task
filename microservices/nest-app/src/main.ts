@@ -23,10 +23,10 @@ async function bootstrap() {
 
    app.enableCors({
       origin: [envService.getClientUrl()],
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       credentials: true,
    })
-   const logger = new Logger()
+   // const logger = new Logger()
 
    // app.useGlobalFilters(new HttpExceptionFilter(logger))
 
