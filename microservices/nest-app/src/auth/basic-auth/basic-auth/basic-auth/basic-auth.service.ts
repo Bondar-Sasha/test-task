@@ -1,5 +1,6 @@
-import { Inject, Injectable, InternalServerErrorException } from '@nestjs/common'
-import { Redis } from 'ioredis'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
+import Redis from 'ioredis'
+import { InjectRedis } from '@nestjs-modules/ioredis'
 
 import { AppRoutesService } from '@cfg'
 import { AuthTypes } from '@test_task/types'
@@ -9,7 +10,7 @@ import { EmailNotificationService } from 'email-notification/email-notification/
 @Injectable()
 export class BasicAuthService {
    constructor(
-      @Inject('REDIS_AUTH_SERVICE') private readonly redisAuthClient: Redis,
+      @InjectRedis() private readonly redisAuthClient: Redis,
       private readonly tokensService: TokensService,
       private readonly emailNotificationService: EmailNotificationService,
    ) {}
@@ -20,13 +21,16 @@ export class BasicAuthService {
       try {
          const generatedCode = this.tokensService.generateCode()
          const generatedChuckOfUrl = this.tokensService.getUniqueStr('')
-
-         // Сначала отправляем данные в Redis
-         await Promise.all([
-            // this.emailNotificationService.sendMail(userData.email, 'Confirm your email', `Your code: ${generatedCode}`),
-            // this.redisAuthClient.set(generatedChuckOfUrl, JSON.stringify({ ...userData, code: generatedCode })),
-         ])
-         console.log(Object.keys(this.redisAuthClient))
+         await this.redisAuthClient.set(generatedChuckOfUrl, JSON.stringify({ code: generatedCode }))
+         const g = await this.redisAuthClient.get(generatedChuckOfUrl)
+         console.log(g)
+         /*
+          * Сначала отправляем данные в Redis
+          * await Promise.all([
+          *    // this.emailNotificationService.sendMail(userData.email, 'Confirm your email', `Your code: ${generatedCode}`),
+          *    // this.redisAuthClient.set(generatedChuckOfUrl, JSON.stringify({ ...userData, code: generatedCode })),
+          * ])
+          */
          return { confirmEmailUrl: 'http://localhost:3001/api/auth/registration/commit/' + generatedChuckOfUrl }
       } catch (error) {
          console.log(error)

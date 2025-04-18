@@ -1,6 +1,6 @@
 export interface AppEnvs {
    APP_MODE: 'development' | 'production'
-   CLIENT_URL?: string
+   CLIENT_URL: string
    JWT_SECRET: string
 
    EXPRESS_APP_PORT: number
@@ -22,7 +22,7 @@ export interface AppEnvs {
    MONGO_INITDB_ROOT_USERNAME: string
    MONGO_INITDB_ROOT_PASSWORD: string
    MONGO_INITDB_DATABASE: string
-   MONGO_LOG_LEVEL?: string
+   MONGO_LOG_LEVEL: string
    MONGO_HOST: string
    MONGO_PORT: number
 

@@ -2,7 +2,8 @@ import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { EnvService } from '@cfg'
-import { ConnectionService } from './connection/connection.service'
+import { User } from './entities'
+import { UserRepository } from './repositories'
 
 @Module({
    imports: [
@@ -14,19 +15,22 @@ import { ConnectionService } from './connection/connection.service'
 
             return {
                type: 'postgres',
+               name: 'postgres',
                host: POSTGRES_HOST,
                port: POSTGRES_PORT,
                username: POSTGRES_USER,
                password: POSTGRES_PASSWORD,
                database: POSTGRES_DB,
                autoLoadEntities: true,
+               entities: [User],
                synchronize: envService.getAppMode() === 'development',
                logging: envService.getAppMode() === 'development',
             }
          },
       }),
+      TypeOrmModule.forFeature([User, UserRepository]),
    ],
-   providers: [ConnectionService],
-   exports: [ConnectionService],
+   providers: [UserRepository],
+   exports: [UserRepository],
 })
 export class PostgresModule {}

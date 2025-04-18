@@ -6,7 +6,7 @@ import { NotFoundException } from '@nestjs/common'
 
 class EnvironmentVariables implements AppEnvs {
    @IsString()
-   CLIENT_URL?: string
+   CLIENT_URL: string
 
    @IsString()
    JWT_SECRET: string
@@ -51,7 +51,7 @@ class EnvironmentVariables implements AppEnvs {
    @IsString()
    MONGO_INITDB_DATABASE: string
    @IsString()
-   MONGO_LOG_LEVEL?: string
+   MONGO_LOG_LEVEL: string
    @IsString()
    MONGO_HOST: string
    @IsNumber()

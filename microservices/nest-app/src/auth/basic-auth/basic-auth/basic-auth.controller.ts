@@ -1,5 +1,6 @@
 import { Body, Controller, Patch, Post, UseGuards } from '@nestjs/common'
 import { AccessTokenMiddleware, RefreshTokenMiddleware } from 'utils/TokensCheckMiddleware'
+
 import { BasicAuthService } from './basic-auth/basic-auth.service'
 import {
    RegistrationAttemptRequest,
