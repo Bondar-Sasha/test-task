@@ -3,9 +3,19 @@ export namespace Postgres {
       id: number
       email: string
       role: 'user' | 'admin'
-      refresh_token: string
       provider: 'google' | 'github' | 'local'
       is_verified_email: boolean
+      refresh_token?: string
+      tel?: string
+      username?: string
+      password?: string
+   }
+   export interface MakeUserSnapshot {
+      email: string
+      role?: 'user' | 'admin'
+      provider?: 'google' | 'github' | 'local'
+      is_verified_email?: boolean
+      refresh_token?: string
       tel?: string
       username?: string
       password?: string

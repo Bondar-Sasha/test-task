@@ -2,34 +2,24 @@ import { Body, Controller, Patch, Post, UseGuards } from '@nestjs/common'
 import { AccessTokenMiddleware, RefreshTokenMiddleware } from 'utils/TokensCheckMiddleware'
 
 import { BasicAuthService } from './basic-auth/basic-auth.service'
-import {
-   RegistrationAttemptRequest,
-   RegistrationAttemptResponse,
-   CommitRegistrationRequest,
-   CommitRegistrationResponse,
-} from '../DTO/RegistrationDTO.dto'
+import { LocalRegistrationRequest, LocalRegistrationResponse } from '../DTO/RegistrationDTO.dto'
 import { AppRoutesService } from '@cfg'
 
-const { prefix, registrationAttemptRoute, registrationCommitRoute, loginRoute, logoutRoute } =
-   AppRoutesService.getAuthRoutes()
+const { prefix, localRegistrationRoute, localLoginRoute, logoutRoute } = AppRoutesService.getAuthRoutes()
 
 @Controller(prefix)
 export class BasicAuthController {
    constructor(private readonly basicAuthService: BasicAuthService) {}
 
-   @Post(registrationAttemptRoute)
-   async registrationAttempt(
-      @Body() registrationData: RegistrationAttemptRequest,
-   ): Promise<RegistrationAttemptResponse> {
-      return await this.basicAuthService.registrationAttempt(registrationData)
+   @Post(localRegistrationRoute)
+   async registration(
+      @Body()
+      registrationData: LocalRegistrationRequest,
+   ): Promise<LocalRegistrationResponse> {
+      return await this.basicAuthService.registration(registrationData)
    }
 
-   // @Post(registrationCommitRoute())
-   // async registrationCommit(@Body() registrationData: CommitRegistrationRequest): Promise<CommitRegistrationResponse> {
-   //    // return await this.basicAuthService.registrationCommit(registrationData)
-   // }
-
-   @Patch(loginRoute)
+   @Patch(localLoginRoute)
    @UseGuards(RefreshTokenMiddleware)
    login() {
       return 'login'

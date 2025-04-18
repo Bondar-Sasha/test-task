@@ -1,23 +1,19 @@
 export namespace AuthTypes {
-   export interface RegistrationAttemptRequest {
+   export interface LocalRegistrationRequest {
       email: string
       password: string
-      username: string
-      tel: string
-   }
-   export interface RegistrationAttemptResponse {
-      confirmEmailUrl: string
+      username?: string
+      tel?: string
    }
 
-   export interface CommitRegistrationRequest {
-      codeFromEmail: number
-   }
-   export interface CommitRegistrationResponse {
+   export interface LocalRegistrationResponse {
       id: number
       email: string
+      role: 'user' | 'admin'
       username: string
-      tel: string
-      accessToken: string
+      provider: 'google' | 'github' | 'local'
+      is_verified_email: boolean
+      tel?: string
    }
 
    // export interface LoginRequest {

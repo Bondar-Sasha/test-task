@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { createHash } from 'crypto'
+import { hash, compare } from 'bcrypt'
 
 import { TokensCreatingPayload } from '@test_task/types'
 
@@ -18,8 +18,11 @@ export class TokensService {
       return Math.floor(100000 + Math.random() * 900000)
    }
 
-   getUniqueStr(payload: string) {
-      return createHash('md5').update(payload).digest('hex').slice(0, 40)
+   async hashPassword(password: string) {
+      return await hash(password, 12)
+   }
+   async compareHashes(password: string, hash: string) {
+      return await compare(password, hash)
    }
 
    isValidToken(token: string) {
