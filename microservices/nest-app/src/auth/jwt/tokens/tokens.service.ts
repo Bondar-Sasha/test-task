@@ -2,16 +2,16 @@ import { Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { hash, compare } from 'bcrypt'
 
-import { TokensCreatingPayload } from '@test_task/types'
+import { AuthTypes } from '@test_task/types'
 
 @Injectable()
 export class TokensService {
    constructor(private readonly jwtService: JwtService) {}
 
-   generateTokens(payload: TokensCreatingPayload) {
+   generateTokens(payload: AuthTypes.TokensCreatingPayload): AuthTypes.Tokens {
       return {
-         accessToken: this.jwtService.sign(payload, { expiresIn: '15m' }),
-         refreshToken: this.jwtService.sign(payload, { expiresIn: '7d' }),
+         access_token: this.jwtService.sign(payload, { expiresIn: '15m' }),
+         refresh_token: this.jwtService.sign(payload, { expiresIn: '7d' }),
       }
    }
    generateCode(): number {
@@ -21,13 +21,17 @@ export class TokensService {
    async hashPassword(password: string) {
       return await hash(password, 12)
    }
-   async compareHashes(password: string, hash: string) {
+   async compareHashes(password: string, hash?: string) {
+      if (!hash) return false
       return await compare(password, hash)
+   }
+   async generateUrl(data: string): Promise<string> {
+      return await hash(data, 10)
    }
 
    isValidToken(token: string) {
       try {
-         return this.jwtService.verify<TokensCreatingPayload>(token)
+         return this.jwtService.verify<AuthTypes.TokensCreatingPayload>(token)
       } catch {
          return null
       }

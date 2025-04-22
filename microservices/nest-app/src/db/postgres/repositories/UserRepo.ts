@@ -36,9 +36,10 @@ export class UserRepository extends Repository<Postgres.UserSnapshot> {
    getSnapshotByEmail(email: string) {
       return this.findOneBy({ email })
    }
-   rewriteRefreshToken(id: number, refreshToken: string) {
+   rewriteRefreshToken(id: number, refreshToken: string | null) {
       return this.update(id, { refresh_token: refreshToken })
    }
+
    rewriteIsVerifiedEmail(id: number, isVerified: boolean) {
       return this.update(id, { is_verified_email: isVerified })
    }

@@ -10,7 +10,8 @@ export class AppRoutesService {
 
          localRegistrationRoute: '/local/registration',
          localLoginRoute: '/local/login',
-         confirmEmailRoute: '/confirmEmail',
+         refreshTokensRoute: '/refreshTokens',
+         confirmEmailRoute: (UrlForCode?: string | number) => `/confirmEmail/${UrlForCode || ':urlForCode'}`,
          sendCodeRoute: '/sendCode',
 
          githubRegisterRoute: '/github/registration',

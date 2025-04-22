@@ -1,32 +1,37 @@
 import { NestFactory } from '@nestjs/core'
+import * as cookieParser from 'cookie-parser'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { Logger, ValidationPipe } from '@nestjs/common'
 
 import { AppModule } from './app.module'
 import { EnvService } from '@cfg'
-import { HttpExceptionFilter } from '@utils'
-import { TransformPlainToInstance } from 'class-transformer'
+import { HttpExceptionFilter, RedirectInterceptor } from '@utils'
 
 async function bootstrap() {
    const app = await NestFactory.create(AppModule)
 
    const envService = app.get(EnvService)
 
+   app.use(cookieParser())
+
    app.useGlobalPipes(
       new ValidationPipe({
-         whitelist: true,
          transform: true,
+
+         whitelist: true,
+         forbidNonWhitelisted: true,
       }),
    )
+   app.useGlobalInterceptors(new RedirectInterceptor())
 
    app.enableCors({
       origin: [envService.getClientUrl()],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       credentials: true,
    })
-   // const logger = new Logger()
+   const logger = new Logger()
 
-   // app.useGlobalFilters(new HttpExceptionFilter(logger))
+   app.useGlobalFilters(new HttpExceptionFilter(logger))
 
    app.setGlobalPrefix('api')
 

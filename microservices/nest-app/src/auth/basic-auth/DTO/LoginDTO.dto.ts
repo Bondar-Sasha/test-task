@@ -2,7 +2,7 @@ import { IsEmail, IsOptional, IsPhoneNumber, IsString, MaxLength, MinLength } fr
 
 import { AuthTypes } from '@test_task/types'
 
-export class LocalRegistrationRequest implements AuthTypes.LocalRegistrationRequest {
+export class LoginRequest implements AuthTypes.LoginRequest {
    @IsOptional()
    @IsPhoneNumber(undefined, { message: 'Phone number must be valid' })
    tel?: string

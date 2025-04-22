@@ -1,12 +1,14 @@
 export namespace AuthTypes {
-   export interface LocalRegistrationRequest {
-      email: string
-      password: string
-      username?: string
-      tel?: string
+   export interface TokensCreatingPayload {
+      userId: number
    }
 
-   export interface LocalRegistrationResponse {
+   export interface Tokens {
+      access_token: string
+      refresh_token: string
+   }
+
+   export interface UserCreds {
       id: number
       email: string
       role: 'user' | 'admin'
@@ -14,17 +16,27 @@ export namespace AuthTypes {
       provider: 'google' | 'github' | 'local'
       is_verified_email: boolean
       tel?: string
+      access_token?: string
    }
 
-   // export interface LoginRequest {
-   //    email: string
-   //    password: string
-   // }
-   // export interface LoginResponse {
-   //    email: string
-   //    accessToken: string
-   // }
-   // export type LogoutRequest = void
+   export interface LocalRegistrationRequest {
+      email: string
+      password: string
+      username?: string
+      tel?: string
+   }
 
-   // export type LogoutResponse = void
+   export interface LoginRequest {
+      email: string
+      password: string
+   }
+
+   export interface ConfirmEmailRequest {
+      code: number
+   }
+   export type ConfirmEmailResponse = void
+
+   export interface LogoutRequest {
+      id: number
+   }
 }
