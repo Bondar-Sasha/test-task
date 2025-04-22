@@ -25,9 +25,6 @@ export class TokensService {
       if (!hash) return false
       return await compare(password, hash)
    }
-   async generateUrl(data: string): Promise<string> {
-      return await hash(data, 10)
-   }
 
    isValidToken(token: string) {
       try {
