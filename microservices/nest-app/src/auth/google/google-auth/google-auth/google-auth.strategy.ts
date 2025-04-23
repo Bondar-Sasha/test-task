@@ -2,65 +2,90 @@ import { Injectable, BadRequestException } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
 import { Strategy, Profile, VerifyCallback } from 'passport-google-oauth20'
 import { EnvService } from '@cfg'
-import { Postgres, AuthTypes } from '@test_task/types'
+import { AuthTypes } from '@test_task/types'
 import { UserRepository } from 'db/postgres/repositories'
 import { TokensService } from 'auth/jwt/tokens/tokens.service'
+import { Request } from 'express'
+import { AuthenticateOptions } from 'passport'
+
+export interface GoogleRequestObj extends Request {
+   user: AuthTypes.UserCreds & AuthTypes.Tokens
+}
+interface GoogleAuthOptions extends AuthenticateOptions {
+   callbackURL: string
+}
 
 @Injectable()
 export class GoogleAuthService extends PassportStrategy(Strategy) {
    user: AuthTypes.UserCreds & AuthTypes.Tokens
 
    constructor(
-      private readonly configService: EnvService,
+      private readonly envService: EnvService,
       private readonly postgresUserRepo: UserRepository,
       private readonly tokensService: TokensService,
    ) {
-      const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL } = configService.getGoogleCredentials()
+      const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_CALLBACK_URL } = envService.getGoogleCredentials()
       super({
          clientID: GOOGLE_CLIENT_ID,
          clientSecret: GOOGLE_CLIENT_SECRET,
          callbackURL: GOOGLE_CALLBACK_URL,
+         passReqToCallback: true,
          scope: ['email', 'profile'],
       })
    }
+   authenticate(req: Request, options?: GoogleAuthOptions): void {
+      const action = req.path.includes('registration') ? 'registration' : 'login'
 
-   async validate(accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) {
-      // : Promise<AuthTypes.UserCreds & AuthTypes.Tokens>
-      done(null, profile)
-
-      // const email = profile.emails?.[0]?.value
-
-      // if (!email) {
-      //    throw new Error('Google authentication failed')
-      // }
-
-      // const existingUser = await this.postgresUserRepo.getSnapshotByEmail(email)
-
-      // return existingUser ? this.handleExistingUser(existingUser) : this.handleNewUser(email)
+      const authOptions: GoogleAuthOptions = {
+         ...options,
+         callbackURL: `${this.envService.getGoogleCredentials().GOOGLE_CALLBACK_URL}/${action}`,
+      }
+      super.authenticate(req, authOptions)
    }
 
-   // private async handleExistingUser(user: Postgres.UserSnapshot): Promise<AuthTypes.UserCreds & AuthTypes.Tokens> {
-   //    const tokens = this.tokensService.generateTokens({ userId: user.id })
-   //    return {
-   //       ...user,
-   //       ...tokens,
-   //       username: user.username || user.email,
-   //    }
-   // }
+   async validate(req: Request, accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) {
+      const action = req.path.includes('registration') ? 'registration' : 'login'
+      const email = profile.emails?.[0]?.value
 
-   // private async handleNewUser(email: string): Promise<AuthTypes.UserCreds & AuthTypes.Tokens> {
-   //    const newUser = await this.postgresUserRepo.saveSnapshot({
-   //       email,
-   //       provider: 'google',
-   //       is_verified_email: true,
-   //    })
+      if (!email || !action) {
+         done(new Error('Google authentication failed'))
+         return
+      }
 
-   //    const tokens = this.tokensService.generateTokens({ userId: newUser.id })
+      const userFromDB = await this.postgresUserRepo.getSnapshotByEmail(email)
 
-   //    return {
-   //       ...newUser,
-   //       ...tokens,
-   //       username: newUser.username || newUser.email,
-   //    }
-   // }
+      if (action === 'registration' && userFromDB) {
+         done(new BadRequestException('User with this email already exists'))
+         return
+      }
+      if (action === 'login' && !userFromDB) {
+         done(new BadRequestException('User with this email does not exist'))
+         return
+      }
+
+      if (action === 'registration') {
+         const dbRes = await this.postgresUserRepo.saveSnapshot({
+            email,
+            provider: 'google',
+            is_verified_email: true,
+         })
+         const tokens = this.tokensService.generateTokens({ userId: dbRes.id })
+         done(null, { dbRes, ...tokens })
+         return
+      }
+      if (!userFromDB) {
+         done(new BadRequestException('User with this email does not exist'))
+         return
+      }
+
+      if (userFromDB.provider !== 'google') {
+         done(new BadRequestException(`User has created an account via ${userFromDB.provider} service`))
+         return
+      }
+      const tokens = this.tokensService.generateTokens({ userId: userFromDB.id })
+
+      const dbRes = await this.postgresUserRepo.rewriteRefreshToken(userFromDB.id, tokens.refresh_token)
+
+      done(null, { ...dbRes, ...tokens })
+   }
 }

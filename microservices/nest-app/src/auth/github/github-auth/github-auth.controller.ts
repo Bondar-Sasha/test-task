@@ -17,7 +17,7 @@ export class GithubAuthController {
 
    @Get(githubCallbackRoute)
    githubCallback(@Req() req: Request, @Res() res: Response) {
-      const origin = req.query.state
+      console.log(req.user)
 
       const message =
          origin === 'register'

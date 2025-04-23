@@ -16,7 +16,7 @@ export class AccessTokenGuard implements CanActivate {
    canActivate(context: ExecutionContext): boolean {
       const req = context.switchToHttp().getRequest<AuthenticatedRequest>()
 
-      const accessToken = req.headers['authorization']?.split(' ')[1] as string
+      const accessToken = req.cookies?.access_token as string
 
       if (!accessToken) {
          throw new UnauthorizedException('Access token is missing')
@@ -26,8 +26,6 @@ export class AccessTokenGuard implements CanActivate {
       if (!validationData) {
          throw new UnauthorizedException('Access token is not valid')
       }
-
-      req.tokenData = validationData
       return true
    }
 }

@@ -1,6 +1,7 @@
 export interface AppEnvs {
    APP_MODE: 'development' | 'production'
    CLIENT_URL: string
+   SESSION_SECRET: string
    JWT_SECRET: string
 
    EXPRESS_APP_PORT: number

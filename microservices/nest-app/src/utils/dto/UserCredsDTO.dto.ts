@@ -1,5 +1,4 @@
 import {
-   IsBoolean,
    IsEmail,
    IsIn,
    IsInt,
@@ -7,7 +6,6 @@ import {
    IsOptional,
    IsPhoneNumber,
    IsPositive,
-   IsString,
    MaxLength,
    MinLength,
 } from 'class-validator'
@@ -28,9 +26,6 @@ export class UserCredsDto implements AuthTypes.UserCreds {
    @IsPhoneNumber(undefined, { message: 'Phone number must be valid' })
    tel?: string
 
-   @IsBoolean()
-   is_verified_email: boolean
-
    @MinLength(6, { message: 'Username must be more than 6 characters' })
    @MaxLength(15, { message: 'Username must be less than 15 characters' })
    username: string
@@ -45,8 +40,10 @@ export class UserCredsDto implements AuthTypes.UserCreds {
    })
    role: 'user' | 'admin'
 
-   @IsOptional()
-   @IsString()
+   @Exclude()
+   is_verified_email?: boolean
+
+   @Exclude()
    accessToken?: string
 
    @Exclude()

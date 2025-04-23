@@ -1,13 +1,14 @@
 import { PassportStrategy } from '@nestjs/passport'
-import { Strategy } from 'passport-github2'
+import { Strategy, Profile } from 'passport-github2'
+import { VerifyCallback } from 'passport-oauth2'
 import { Injectable } from '@nestjs/common'
 
 import { EnvService } from '@cfg'
 
 @Injectable()
 export class GithubAuthService extends PassportStrategy(Strategy, 'github') {
-   constructor(private readonly configService: EnvService) {
-      const { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_CALLBACK_URL } = configService.getGithubCredentials()
+   constructor(private readonly envService: EnvService) {
+      const { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_CALLBACK_URL } = envService.getGithubCredentials()
       super({
          clientID: GITHUB_CLIENT_ID,
          clientSecret: GITHUB_CLIENT_SECRET,
@@ -16,5 +17,7 @@ export class GithubAuthService extends PassportStrategy(Strategy, 'github') {
       })
    }
 
-   validate() {}
+   validate(accessToken: string, refreshToken: string, profile: Profile, done: VerifyCallback) {
+      done(null, profile)
+   }
 }

@@ -9,6 +9,9 @@ export class EnvService {
    getJwtSecret() {
       return this.configService.get('JWT_SECRET', { infer: true })
    }
+   getSessionSecret() {
+      return this.configService.get('SESSION_SECRET', { infer: true })
+   }
 
    getClientUrl() {
       return this.configService.get('CLIENT_URL', { infer: true })

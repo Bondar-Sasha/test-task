@@ -32,8 +32,6 @@ export class BasicAuthService {
 
       const userFromDB = await this.postgresUserRepo.saveSnapshot({ ...userData, password: hashPassword })
 
-      delete userFromDB.password
-
       return { ...userFromDB, username: userData.username || userFromDB.email }
    }
 
@@ -75,8 +73,6 @@ export class BasicAuthService {
       }
 
       await this.postgresUserRepo.rewriteRefreshToken(user.id, tokens.refresh_token)
-
-      delete user.password
 
       return { ...user, ...tokens, username: user.username || user.email }
    }

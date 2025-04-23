@@ -9,6 +9,9 @@ class EnvironmentVariables implements AppEnvs {
    CLIENT_URL: string
 
    @IsString()
+   SESSION_SECRET: string
+
+   @IsString()
    JWT_SECRET: string
 
    @IsString()

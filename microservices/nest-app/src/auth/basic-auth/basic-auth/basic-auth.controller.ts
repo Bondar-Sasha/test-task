@@ -7,14 +7,13 @@ import { LocalRegistrationRequest } from '../DTO/RegistrationDTO.dto'
 import { LoginRequest } from '../DTO/LoginDTO.dto'
 import { AppRoutesService } from '@cfg'
 import { ConfirmEmailRequest } from '../DTO/ConfirmEmailDTO.dto'
-import { LogoutRequest } from '../DTO/LogoutDTO.dto'
-import { TokensDto } from '../DTO/TokensDTO.dto'
+import { AuthTypes } from '@test_task/types'
 
 const { prefix, localRegistrationRoute, localLoginRoute, logoutRoute, confirmEmailRoute, refreshTokensRoute } =
    AppRoutesService.getAuthRoutes()
 
-const userWithTokensGuard = (data: (UserCredsDto & TokensDto) | RedirectDto): data is UserCredsDto & TokensDto => {
-   return 'refresh_token' in data
+const userWithTokensGuard = (data: (AuthTypes.UserCreds & AuthTypes.Tokens) | RedirectDto): data is RedirectDto => {
+   return 'statusCode' in data
 }
 
 @Controller(prefix)
@@ -38,11 +37,16 @@ export class BasicAuthController {
       const serviceRes = await this.basicAuthService.login(email, password)
 
       if (userWithTokensGuard(serviceRes)) {
-         res.cookie('refresh_token', serviceRes.refresh_token, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
-         return new UserCredsDto(serviceRes)
+         return serviceRes
       }
 
-      return serviceRes
+      res.cookie('refresh_token', serviceRes.refresh_token, {
+         maxAge: 30 * 24 * 60 * 60 * 1000,
+         httpOnly: true,
+         secure: true,
+      })
+      res.cookie('access_token', serviceRes.access_token, { maxAge: 15 * 60 * 1000, httpOnly: true, secure: true })
+      return new UserCredsDto(serviceRes)
    }
 
    @Patch(confirmEmailRoute())
@@ -57,20 +61,25 @@ export class BasicAuthController {
    @Get(refreshTokensRoute)
    @UseGuards(AccessTokenGuard)
    @UseGuards(RefreshTokenGuard)
-   async refreshTokens(
-      @Req() req: AuthenticatedRequest,
-      @Res({ passthrough: true }) res: Response,
-   ): Promise<TokensDto> {
+   async refreshTokens(@Req() req: AuthenticatedRequest, @Res({ passthrough: true }) res: Response): Promise<void> {
       const serviceRes = await this.basicAuthService.refreshTokens(req.tokenData.userId, req.refresh_token)
-      res.cookie('refresh_token', serviceRes.refresh_token, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
-      return serviceRes
+      res.cookie('refresh_token', serviceRes.refresh_token, {
+         maxAge: 30 * 24 * 60 * 60 * 1000,
+         httpOnly: true,
+         secure: true,
+      })
+      res.cookie('access_token', serviceRes.access_token, { maxAge: 15 * 60 * 1000, httpOnly: true, secure: true })
    }
 
    @Patch(logoutRoute)
    @UseGuards(AccessTokenGuard)
    @UseGuards(RefreshTokenGuard)
-   async logout(@Body() { id }: LogoutRequest, @Res({ passthrough: true }) res: Response): Promise<void> {
-      await this.basicAuthService.logout(id)
+   async logout(
+      @Req() { tokenData: { userId } }: AuthenticatedRequest,
+      @Res({ passthrough: true }) res: Response,
+   ): Promise<void> {
+      await this.basicAuthService.logout(userId)
       res.clearCookie('refresh_token')
+      res.clearCookie('access_token')
    }
 }

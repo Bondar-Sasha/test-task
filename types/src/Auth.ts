@@ -14,9 +14,7 @@ export namespace AuthTypes {
       role: 'user' | 'admin'
       username: string
       provider: 'google' | 'github' | 'local'
-      is_verified_email: boolean
       tel?: string
-      access_token?: string
    }
 
    export interface LocalRegistrationRequest {
@@ -33,10 +31,5 @@ export namespace AuthTypes {
 
    export interface ConfirmEmailRequest {
       code: number
-   }
-   export type ConfirmEmailResponse = void
-
-   export interface LogoutRequest {
-      id: number
    }
 }
