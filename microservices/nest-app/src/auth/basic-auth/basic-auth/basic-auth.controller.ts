@@ -1,7 +1,20 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Patch, Post, Redirect, Req, Res, UseGuards } from '@nestjs/common'
+import {
+   Body,
+   Controller,
+   Get,
+   HttpRedirectResponse,
+   Param,
+   ParseIntPipe,
+   Patch,
+   Post,
+   Redirect,
+   Req,
+   Res,
+   UseGuards,
+} from '@nestjs/common'
 import { Response } from 'express'
 
-import { AccessTokenGuard, AuthenticatedRequest, RedirectDto, RefreshTokenGuard, UserCredsDto } from '@utils'
+import { AccessTokenGuard, AuthenticatedRequest, RefreshTokenGuard } from '@utils'
 import { BasicAuthService } from './basic-auth/basic-auth.service'
 import { LocalRegistrationRequest } from '../DTO/RegistrationDTO.dto'
 import { LoginRequest } from '../DTO/LoginDTO.dto'
@@ -14,48 +27,47 @@ import { ApiResponse, ApiTags } from '@nestjs/swagger'
 const { prefix, localRegistrationRoute, localLoginRoute, logoutRoute, confirmEmailRoute, refreshTokensRoute } =
    AppRoutesService.getAuthRoutes()
 
-const userWithTokensGuard = (data: (AuthTypes.UserCreds & AuthTypes.Tokens) | RedirectDto): data is RedirectDto => {
+const userWithTokensGuard = (data: AuthTypes.Tokens | HttpRedirectResponse): data is HttpRedirectResponse => {
    return 'statusCode' in data
 }
-
+@ApiResponse({ status: 301 })
 @ApiTags('auth/app')
 @Controller(prefix)
 export class BasicAuthController {
    constructor(private readonly basicAuthService: BasicAuthService) {}
 
-   @ApiResponse({ type: UserCredsDto })
+   @Redirect(localLoginRoute, 301)
    @Post(localRegistrationRoute)
    async registration(
       @Body()
       registrationData: LocalRegistrationRequest,
-   ): Promise<UserCredsDto> {
-      return new UserCredsDto(await this.basicAuthService.registration(registrationData))
+   ): Promise<void> {
+      await this.basicAuthService.registration(registrationData)
    }
 
-   @ApiResponse({ type: UserCredsDto, description: "When user's email is verified" })
-   @ApiResponse({ status: 302, description: "When user's email is not verified" })
+   @Redirect('/', 301)
    @Patch(localLoginRoute)
    async login(
       @Body()
       { email, password }: LoginRequest,
       @Res({ passthrough: true }) res: Response,
-   ): Promise<UserCredsDto | RedirectDto> {
+   ): Promise<void> {
       const serviceRes = await this.basicAuthService.login(email, password)
 
-      if (userWithTokensGuard(serviceRes)) {
-         return serviceRes
+      if (!userWithTokensGuard(serviceRes)) {
+         setTokensInCookies(res, serviceRes.access_token, serviceRes.refresh_token)
       }
-      setTokensInCookies(res, serviceRes.access_token, serviceRes.refresh_token)
-      return new UserCredsDto(serviceRes)
    }
-   @ApiResponse({ status: 301 })
+
    @Patch(confirmEmailRoute())
    @Redirect('/', 301)
    async confirmEmail(
       @Param('urlForCode', ParseIntPipe) urlForCode: number,
       @Body() { code }: ConfirmEmailRequest,
+      @Res({ passthrough: true }) res: Response,
    ): Promise<void> {
-      await this.basicAuthService.confirmEmail(urlForCode, code)
+      const serviceRes = await this.basicAuthService.confirmEmail(urlForCode, code)
+      setTokensInCookies(res, serviceRes.access_token, serviceRes.refresh_token)
    }
 
    @Get(refreshTokensRoute)

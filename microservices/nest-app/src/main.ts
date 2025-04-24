@@ -6,7 +6,7 @@ import { json } from 'express'
 
 import { AppModule } from './app.module'
 import { EnvService } from '@cfg'
-import { HttpExceptionFilter, RedirectInterceptor } from '@utils'
+import { HttpExceptionFilter } from '@utils'
 
 async function bootstrap() {
    const app = await NestFactory.create(AppModule)
@@ -25,7 +25,6 @@ async function bootstrap() {
       }),
    )
    app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector), { excludeExtraneousValues: true }))
-   app.useGlobalInterceptors(new RedirectInterceptor())
 
    app.enableCors({
       origin: [envService.getClientUrl()],
