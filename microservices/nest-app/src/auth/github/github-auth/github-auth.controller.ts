@@ -1,29 +1,25 @@
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common'
+import { Controller, Get, Redirect, Req, Res, UseGuards } from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
-import { Response, Request } from 'express'
+import { Response } from 'express'
 
 import { AppRoutesService } from '@cfg'
+import { setTokensInCookies } from 'auth/utils'
+import { GitHubRequestObj } from './github-auth/github-auth.strategy'
 
-const { prefix, githubRegisterRoute, githubLoginRoute, githubCallbackRoute } = AppRoutesService.getAuthRoutes()
+const { prefix, githubRegisterRoute, githubLoginRoute, githubRegisterCallbackRoute, githubLoginCallbackRoute } =
+   AppRoutesService.getAuthRoutes()
 
 @Controller(prefix)
 @UseGuards(AuthGuard('github'))
 export class GithubAuthController {
-   @Get(githubLoginRoute)
-   githubLogin() {}
+   @Get(`${githubLoginRoute}|${githubRegisterRoute}`)
+   @UseGuards(AuthGuard('github'))
+   githubAuth() {}
 
-   @Get(githubRegisterRoute)
-   githubRegister() {}
-
-   @Get(githubCallbackRoute)
-   githubCallback(@Req() req: Request, @Res() res: Response) {
-      console.log(req.user)
-
-      const message =
-         origin === 'register'
-            ? '✅ Регистрация через Github прошла успешно!'
-            : '✅ Вход через Github выполнен успешно!'
-
-      return res.send(message)
+   @Get(`${githubLoginCallbackRoute}|${githubRegisterCallbackRoute}`)
+   @Redirect('/', 302)
+   @UseGuards(AuthGuard('gitHub'))
+   loginOrRegisterCallback(@Req() req: GitHubRequestObj, @Res() res: Response) {
+      setTokensInCookies(res, req.user.access_token, req.user.refresh_token)
    }
 }

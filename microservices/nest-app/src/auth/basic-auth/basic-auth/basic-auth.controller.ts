@@ -8,6 +8,7 @@ import { LoginRequest } from '../DTO/LoginDTO.dto'
 import { AppRoutesService } from '@cfg'
 import { ConfirmEmailRequest } from '../DTO/ConfirmEmailDTO.dto'
 import { AuthTypes } from '@test_task/types'
+import { setTokensInCookies } from 'auth/utils'
 
 const { prefix, localRegistrationRoute, localLoginRoute, logoutRoute, confirmEmailRoute, refreshTokensRoute } =
    AppRoutesService.getAuthRoutes()
@@ -39,13 +40,7 @@ export class BasicAuthController {
       if (userWithTokensGuard(serviceRes)) {
          return serviceRes
       }
-
-      res.cookie('refresh_token', serviceRes.refresh_token, {
-         maxAge: 30 * 24 * 60 * 60 * 1000,
-         httpOnly: true,
-         secure: true,
-      })
-      res.cookie('access_token', serviceRes.access_token, { maxAge: 15 * 60 * 1000, httpOnly: true, secure: true })
+      setTokensInCookies(res, serviceRes.access_token, serviceRes.refresh_token)
       return new UserCredsDto(serviceRes)
    }
 
@@ -63,12 +58,7 @@ export class BasicAuthController {
    @UseGuards(RefreshTokenGuard)
    async refreshTokens(@Req() req: AuthenticatedRequest, @Res({ passthrough: true }) res: Response): Promise<void> {
       const serviceRes = await this.basicAuthService.refreshTokens(req.tokenData.userId, req.refresh_token)
-      res.cookie('refresh_token', serviceRes.refresh_token, {
-         maxAge: 30 * 24 * 60 * 60 * 1000,
-         httpOnly: true,
-         secure: true,
-      })
-      res.cookie('access_token', serviceRes.access_token, { maxAge: 15 * 60 * 1000, httpOnly: true, secure: true })
+      setTokensInCookies(res, serviceRes.access_token, serviceRes.refresh_token)
    }
 
    @Patch(logoutRoute)

@@ -13,10 +13,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
       this.logger.error(`${request.method} ${request.originalUrl} error: ${exception.message}`)
 
       response.status(status).json({
-         message: exception.message,
          errorName: exception.name,
-         timestamp: new Date().toISOString(),
-         path: request.url,
+         message: exception.message,
          statusCode: status,
       })
    }

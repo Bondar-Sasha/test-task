@@ -1,6 +1,4 @@
 import { NestFactory } from '@nestjs/core'
-import * as session from 'express-session'
-import * as passport from 'passport'
 import * as cookieParser from 'cookie-parser'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { Logger, ValidationPipe } from '@nestjs/common'
@@ -13,17 +11,6 @@ async function bootstrap() {
    const app = await NestFactory.create(AppModule)
 
    const envService = app.get(EnvService)
-
-   app.use(
-      session({
-         secret: envService.getSessionSecret(),
-         resave: false,
-         saveUninitialized: true,
-      }),
-   )
-
-   app.use(passport.initialize())
-   app.use(passport.session())
 
    app.use(cookieParser())
 

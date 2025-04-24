@@ -47,43 +47,33 @@ export class GoogleAuthService extends PassportStrategy(Strategy) {
       const action = req.path.includes('registration') ? 'registration' : 'login'
       const email = profile.emails?.[0]?.value
 
-      if (!email || !action) {
-         done(new Error('Google authentication failed'))
-         return
+      if (!email) {
+         return done(new Error('Google authentication failed'))
       }
 
       const userFromDB = await this.postgresUserRepo.getSnapshotByEmail(email)
 
-      if (action === 'registration' && userFromDB) {
-         done(new BadRequestException('User with this email already exists'))
-         return
-      }
-      if (action === 'login' && !userFromDB) {
-         done(new BadRequestException('User with this email does not exist'))
-         return
-      }
-
       if (action === 'registration') {
+         if (userFromDB) {
+            return done(new BadRequestException('User with this email already exists'))
+         }
          const dbRes = await this.postgresUserRepo.saveSnapshot({
             email,
             provider: 'google',
             is_verified_email: true,
          })
-         const tokens = this.tokensService.generateTokens({ userId: dbRes.id })
-         done(null, { dbRes, ...tokens })
-         return
+         return done(null, { dbRes, ...this.tokensService.generateTokens({ userId: dbRes.id }) })
       }
+
       if (!userFromDB) {
-         done(new BadRequestException('User with this email does not exist'))
-         return
+         return done(new BadRequestException('User with this email does not exist'))
       }
 
       if (userFromDB.provider !== 'google') {
-         done(new BadRequestException(`User has created an account via ${userFromDB.provider} service`))
-         return
+         return done(new BadRequestException(`User has created an account via ${userFromDB.provider} service`))
       }
-      const tokens = this.tokensService.generateTokens({ userId: userFromDB.id })
 
+      const tokens = this.tokensService.generateTokens({ userId: userFromDB.id })
       const dbRes = await this.postgresUserRepo.rewriteRefreshToken(userFromDB.id, tokens.refresh_token)
 
       done(null, { ...dbRes, ...tokens })

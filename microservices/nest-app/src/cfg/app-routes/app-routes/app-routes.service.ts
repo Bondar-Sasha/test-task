@@ -16,11 +16,13 @@ export class AppRoutesService {
 
          githubRegisterRoute: '/github/registration',
          githubLoginRoute: '/github/login',
-         githubCallbackRoute: '/github/callback',
+         githubRegisterCallbackRoute: '/github/callback/registration',
+         githubLoginCallbackRoute: '/github/callback/login',
 
          googleRegisterRoute: '/google/registration',
          googleLoginRoute: '/google/login',
-         googleCallbackRoute: '/google/callback',
+         googleRegisterCallbackRoute: '/google/callback/registration',
+         googleLoginCallbackRoute: '/google/callback/login',
       }
    }
 }

@@ -5,8 +5,11 @@ import { AuthGuard } from '@nestjs/passport'
 import { AppRoutesService } from '@cfg'
 import { GoogleAuthService, GoogleRequestObj } from './google-auth/google-auth.strategy'
 import { TokensService } from './../../jwt/tokens/tokens.service'
+import { setTokensInCookies } from 'auth/utils'
 
-const { prefix, googleRegisterRoute, googleLoginRoute } = AppRoutesService.getAuthRoutes()
+const { prefix, googleRegisterRoute, googleLoginRoute, googleLoginCallbackRoute, googleRegisterCallbackRoute } =
+   AppRoutesService.getAuthRoutes()
+
 @Controller(prefix)
 export class GoogleAuthController {
    constructor(
@@ -14,35 +17,14 @@ export class GoogleAuthController {
       private readonly tokensService: TokensService,
    ) {}
 
-   @Get(googleLoginRoute)
+   @Get(`${googleLoginRoute}|${googleRegisterRoute}`)
    @UseGuards(AuthGuard('google'))
-   googleLogin() {}
+   googleAuth() {}
 
-   @Get(googleRegisterRoute)
-   @UseGuards(AuthGuard('google'))
-   googleRegister() {}
-
-   @Get('google/callback/login')
+   @Get(`${googleLoginCallbackRoute}|${googleRegisterCallbackRoute}`)
    @Redirect('/', 302)
    @UseGuards(AuthGuard('google'))
-   loginCallback(@Req() req: GoogleRequestObj, @Res({ passthrough: true }) res: Response) {
-      res.cookie('refresh_token', req.user.refresh_token, {
-         maxAge: 30 * 24 * 60 * 60 * 1000,
-         httpOnly: true,
-         secure: true,
-      })
-      res.cookie('access_token', req.user.access_token, { maxAge: 15 * 60 * 1000, httpOnly: true, secure: true })
-   }
-
-   @Get('google/callback/registration')
-   @Redirect('/', 302)
-   @UseGuards(AuthGuard('google'))
-   registerCallback(@Req() req: GoogleRequestObj, @Res({ passthrough: true }) res: Response) {
-      res.cookie('refresh_token', req.user.refresh_token, {
-         maxAge: 30 * 24 * 60 * 60 * 1000,
-         httpOnly: true,
-         secure: true,
-      })
-      res.cookie('access_token', req.user.access_token, { maxAge: 15 * 60 * 1000, httpOnly: true, secure: true })
+   loginOrRegisterCallback(@Req() req: GoogleRequestObj, @Res() res: Response) {
+      setTokensInCookies(res, req.user.access_token, req.user.refresh_token)
    }
 }
