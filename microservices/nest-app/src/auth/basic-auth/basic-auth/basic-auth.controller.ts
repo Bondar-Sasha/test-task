@@ -9,6 +9,7 @@ import { AppRoutesService } from '@cfg'
 import { ConfirmEmailRequest } from '../DTO/ConfirmEmailDTO.dto'
 import { AuthTypes } from '@test_task/types'
 import { setTokensInCookies } from 'auth/utils'
+import { ApiResponse, ApiTags } from '@nestjs/swagger'
 
 const { prefix, localRegistrationRoute, localLoginRoute, logoutRoute, confirmEmailRoute, refreshTokensRoute } =
    AppRoutesService.getAuthRoutes()
@@ -17,10 +18,12 @@ const userWithTokensGuard = (data: (AuthTypes.UserCreds & AuthTypes.Tokens) | Re
    return 'statusCode' in data
 }
 
+@ApiTags('auth/app')
 @Controller(prefix)
 export class BasicAuthController {
    constructor(private readonly basicAuthService: BasicAuthService) {}
 
+   @ApiResponse({ type: UserCredsDto })
    @Post(localRegistrationRoute)
    async registration(
       @Body()
@@ -29,6 +32,8 @@ export class BasicAuthController {
       return new UserCredsDto(await this.basicAuthService.registration(registrationData))
    }
 
+   @ApiResponse({ type: UserCredsDto, description: "When user's email is verified" })
+   @ApiResponse({ status: 302, description: "When user's email is not verified" })
    @Patch(localLoginRoute)
    async login(
       @Body()
@@ -43,9 +48,9 @@ export class BasicAuthController {
       setTokensInCookies(res, serviceRes.access_token, serviceRes.refresh_token)
       return new UserCredsDto(serviceRes)
    }
-
+   @ApiResponse({ status: 301 })
    @Patch(confirmEmailRoute())
-   @Redirect('/', 302)
+   @Redirect('/', 301)
    async confirmEmail(
       @Param('urlForCode', ParseIntPipe) urlForCode: number,
       @Body() { code }: ConfirmEmailRequest,

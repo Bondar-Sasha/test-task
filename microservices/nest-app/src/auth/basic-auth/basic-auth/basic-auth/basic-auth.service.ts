@@ -39,42 +39,46 @@ export class BasicAuthService {
       email: string,
       password: string,
    ): Promise<(AuthTypes.UserCreds & AuthTypes.Tokens) | HttpRedirectResponse> {
-      const user = await this.postgresUserRepo.getSnapshotByEmail(email)
+      try {
+         const user = await this.postgresUserRepo.getSnapshotByEmail(email)
 
-      if (!user) {
-         throw new BadRequestException('User with this email does not exist')
-      }
-
-      if (user.provider !== 'local') {
-         throw new BadRequestException(`User has created an account via ${user.provider} service`)
-      }
-
-      const isPasswordValid = await this.tokensService.compareHashes(password, user.password)
-      if (!isPasswordValid) {
-         throw new BadRequestException('Invalid email or password')
-      }
-
-      const tokens = this.tokensService.generateTokens({ userId: user.id })
-
-      if (!user.is_verified_email) {
-         const generatedCode = this.tokensService.generateCode()
-         await Promise.all([
-            this.redisAuthClient.set(String(user.id), generatedCode),
-            this.emailNotificationService.sendMail(
-               user.email,
-               'Email verification',
-               `Your verification code: ${generatedCode}`,
-            ),
-         ])
-         return {
-            url: '/api' + prefix + confirmEmailRoute(user.id),
-            statusCode: 302,
+         if (!user) {
+            throw new BadRequestException('User with this email does not exist')
          }
+
+         if (user.provider !== 'local') {
+            throw new BadRequestException(`User has created an account via ${user.provider} service`)
+         }
+
+         const isPasswordValid = await this.tokensService.compareHashes(password, user.password)
+         if (!isPasswordValid) {
+            throw new BadRequestException('Invalid email or password')
+         }
+
+         const tokens = this.tokensService.generateTokens({ userId: user.id })
+
+         if (!user.is_verified_email) {
+            const generatedCode = this.tokensService.generateCode()
+            await Promise.all([
+               this.redisAuthClient.set(String(user.id), generatedCode),
+               this.emailNotificationService.sendMail(
+                  user.email,
+                  'Email verification',
+                  `Your verification code: ${generatedCode}`,
+               ),
+            ])
+            return {
+               url: '/api' + prefix + confirmEmailRoute(user.id),
+               statusCode: 302,
+            }
+         }
+
+         await this.postgresUserRepo.rewriteRefreshToken(user.id, tokens.refresh_token)
+
+         return { ...user, ...tokens, username: user.username || user.email }
+      } catch (error) {
+         throw new BadRequestException(error.message)
       }
-
-      await this.postgresUserRepo.rewriteRefreshToken(user.id, tokens.refresh_token)
-
-      return { ...user, ...tokens, username: user.username || user.email }
    }
    async confirmEmail(urlForCode: number, code: number): Promise<void | RedirectDto> {
       const user = await this.postgresUserRepo.getSnapshot(urlForCode)
