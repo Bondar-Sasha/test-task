@@ -66,16 +66,19 @@ export class BasicAuthController {
       @Body() { code }: ConfirmEmailRequest,
       @Res({ passthrough: true }) res: Response,
    ): Promise<void> {
-      const serviceRes = await this.basicAuthService.confirmEmail(urlForCode, code)
-      setTokensInCookies(res, serviceRes.access_token, serviceRes.refresh_token)
+      const { refresh_token, access_token } = await this.basicAuthService.confirmEmail(urlForCode, code)
+      setTokensInCookies(res, access_token, refresh_token)
    }
 
    @Get(refreshTokensRoute)
    @UseGuards(AccessTokenGuard)
    @UseGuards(RefreshTokenGuard)
    async refreshTokens(@Req() req: AuthenticatedRequest, @Res({ passthrough: true }) res: Response): Promise<void> {
-      const serviceRes = await this.basicAuthService.refreshTokens(req.tokenData.userId, req.refresh_token)
-      setTokensInCookies(res, serviceRes.access_token, serviceRes.refresh_token)
+      const { refresh_token, access_token } = await this.basicAuthService.refreshTokens(
+         req.tokenData.userId,
+         req.refresh_token,
+      )
+      setTokensInCookies(res, access_token, refresh_token)
    }
 
    @Patch(logoutRoute)

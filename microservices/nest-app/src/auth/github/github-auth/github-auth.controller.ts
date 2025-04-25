@@ -22,7 +22,10 @@ export class GithubAuthController {
    @Get([githubLoginCallbackRoute, githubRegisterCallbackRoute])
    @Redirect('/', 302)
    @UseGuards(AuthGuard('gitHub'))
-   private loginOrRegisterCallback(@Req() req: GitHubRequestObj, @Res() res: Response) {
-      setTokensInCookies(res, req.user.access_token, req.user.refresh_token)
+   private loginOrRegisterCallback(
+      @Req() { user: { access_token, refresh_token } }: GitHubRequestObj,
+      @Res() res: Response,
+   ) {
+      setTokensInCookies(res, access_token, refresh_token)
    }
 }

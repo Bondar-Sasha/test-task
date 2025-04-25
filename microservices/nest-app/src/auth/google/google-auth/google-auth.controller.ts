@@ -27,7 +27,7 @@ export class GoogleAuthController {
    @Get([googleLoginCallbackRoute, googleRegisterCallbackRoute])
    @Redirect('/', 302)
    @UseGuards(AuthGuard('google'))
-   private authCallback(@Req() req: GoogleRequestObj, @Res() res: Response) {
-      setTokensInCookies(res, req.user.access_token, req.user.refresh_token)
+   private authCallback(@Req() { user: { access_token, refresh_token } }: GoogleRequestObj, @Res() res: Response) {
+      setTokensInCookies(res, access_token, refresh_token)
    }
 }
