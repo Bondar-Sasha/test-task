@@ -1,6 +1,5 @@
 import express, { RequestHandler } from 'express'
 import { body } from 'express-validator'
-import passport from 'passport'
 import localAuthController from './controllers/localAuth.controller'
 import { AppRoutes } from '@test_task/shared/routes'
 import accessTokenMiddleware from './middlewares/accessToken.middleware'
@@ -9,7 +8,6 @@ import { baseAuthUrl } from './utils'
 import badRequestMiddleware from './middlewares/badRequest.middleware'
 import googleAuthController from './controllers/googleAuth.controller'
 import githubAuthController from './controllers/githubAuth.controller'
-import envVars from './services/env.service'
 
 const {
    localRegistrationRoute,

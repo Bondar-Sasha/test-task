@@ -1,4 +1,4 @@
-import { hash, compare } from 'bcrypt'
+import { hash, compare, genSalt } from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
 import { AuthTypes } from '@test_task/shared/types'
@@ -22,7 +22,8 @@ class TokensService {
    }
 
    async hashPassword(password: string) {
-      return await hash(password, 12)
+      const salt = await genSalt(12)
+      return await hash(password, salt)
    }
    async compareHashes(password: string, hash?: string) {
       if (!hash) return false

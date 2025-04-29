@@ -9,7 +9,6 @@ import { EnvService } from './env/env.service'
 @Module({
    imports: [
       ConfigModule.forRoot({
-         isGlobal: true,
          envFilePath: resolve(process.cwd(), '../../.env'),
          validate,
       }),

@@ -61,8 +61,6 @@ class BasicAuthService {
          throw ApiError.BadRequest('Invalid email or password')
       }
 
-      const tokens = tokensService.generateTokens({ userId: user.id })
-
       if (!user.is_verified_email) {
          const generatedCode = tokensService.generateCode()
          await Promise.all([
@@ -79,6 +77,7 @@ class BasicAuthService {
             statusCode: 301,
          }
       }
+      const tokens = tokensService.generateTokens({ userId: user.id })
 
       await userRepository.rewriteRefreshToken(user.id, tokens.refresh_token)
 

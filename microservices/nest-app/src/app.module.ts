@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common'
+import { HttpModule } from '@nestjs/axios'
 
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
@@ -7,7 +8,15 @@ import { DbModule } from './db/db.module'
 import { EmailNotificationModule } from './email-notification/email-notification.module'
 
 @Module({
-   imports: [CfgModule, DbModule, EmailNotificationModule],
+   imports: [
+      HttpModule.register({
+         maxRedirects: 5,
+      }),
+      CfgModule,
+      DbModule,
+      EmailNotificationModule,
+   ],
+
    controllers: [AppController],
    providers: [AppService],
 })

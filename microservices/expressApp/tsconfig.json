@@ -19,7 +19,7 @@
       "rootDir": ".",
       "baseUrl": ".",
       "paths": {
-         "@test_task/shared/*": ["../../shared/*"]
+         "@test_task/shared/*": ["../../shared"]
       }
    },
    "ts-node": {

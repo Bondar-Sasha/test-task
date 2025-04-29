@@ -26,7 +26,7 @@ app.use(passport.initialize())
 
 app.use(AppRoutes.backendPrefix + '/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument))
 app.get('/', (_req, res) => {
-   res.send('Hello World!')
+   res.json({ message: 'Hello World!' })
 })
 app.use(router)
 app.use(errorMiddleware)
