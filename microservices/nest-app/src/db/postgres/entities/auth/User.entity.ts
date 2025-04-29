@@ -1,4 +1,4 @@
-import { Postgres } from '@test_task/types'
+import { Postgres } from '@test_task/shared/types'
 import { Entity, Column, PrimaryGeneratedColumn, Index } from 'typeorm'
 
 @Entity()

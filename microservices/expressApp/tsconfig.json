@@ -1,0 +1,31 @@
+{
+   "compilerOptions": {
+      "target": "ES2020",
+      "module": "esnext",
+      "moduleResolution": "node",
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      "isolatedModules": true,
+      "moduleDetection": "force",
+      "strict": true,
+      "noEmit": false,
+      "outDir": "./dist",
+      "noUnusedLocals": false,
+      "noUnusedParameters": false,
+      "noFallthroughCasesInSwitch": true,
+      "noUncheckedSideEffectImports": true,
+      "composite": true,
+      "skipLibCheck": true,
+      "rootDir": ".",
+      "baseUrl": ".",
+      "paths": {
+         "@test_task/shared/*": ["../../shared/*"]
+      }
+   },
+   "ts-node": {
+      "esm": true,
+      "experimentalSpecifierResolution": "node"
+   },
+   "include": ["src/**/*", "../../shared/**/*"],
+   "references": [{ "path": "../../shared/tsconfig.json" }]
+}

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm'
 import { DataSource, Repository } from 'typeorm'
 
-import { Postgres } from '@test_task/types'
+import { Postgres } from '@test_task/shared/types'
 import { User } from '../entities'
 
 @Injectable()

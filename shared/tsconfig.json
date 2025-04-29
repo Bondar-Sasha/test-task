@@ -1,0 +1,19 @@
+{
+   "compilerOptions": {
+      "strict": true,
+      "module": "ESNext",
+      "target": "ES5",
+      "moduleResolution": "node",
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      "forceConsistentCasingInFileNames": false,
+      "declaration": true,
+      "sourceMap": true,
+      "incremental": true,
+      "composite": true,
+      "skipLibCheck": true,
+      "baseUrl": ".",
+      "rootDir": "."
+   },
+   "include": ["**/*.ts"]
+}

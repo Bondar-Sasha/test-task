@@ -10,7 +10,7 @@ import {
    MinLength,
 } from 'class-validator'
 import { Expose } from 'class-transformer'
-import { AuthTypes } from '@test_task/types'
+import { AuthTypes } from '@test_task/shared/types'
 import { ApiProperty } from '@nestjs/swagger'
 
 export class UserCredsDto implements AuthTypes.UserCreds {

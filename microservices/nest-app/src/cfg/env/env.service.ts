@@ -1,16 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 
-import { AppEnvs } from '@test_task/types'
+import { AppEnvs } from '@test_task/shared/types'
 
 @Injectable()
 export class EnvService {
    constructor(private configService: ConfigService<AppEnvs, true>) {}
    getJwtSecret() {
       return this.configService.get('JWT_SECRET', { infer: true })
-   }
-   getSessionSecret() {
-      return this.configService.get('SESSION_SECRET', { infer: true })
    }
 
    getClientUrl() {

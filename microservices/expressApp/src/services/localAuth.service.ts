@@ -1,0 +1,150 @@
+import { createTransport } from 'nodemailer'
+import Redis from 'ioredis'
+
+import { AuthTypes } from '@test_task/shared/types'
+import tokensService from './tokens.service'
+import envVars from './env.service'
+import { AppRoutes } from '@test_task/shared/routes'
+import { prismaClient } from '..'
+import ApiError from './apiErrorsHandler.service'
+import { RedirectResponse } from '../utils'
+import userRepository from '../user.repository'
+
+const { prefix, confirmEmailRoute } = AppRoutes.authRoutes()
+
+const notificationTransporter = createTransport({
+   host: envVars.EMAIL_HOST,
+   port: envVars.EMAIL_PORT,
+   auth: {
+      user: envVars.EMAIL_USER,
+      pass: envVars.EMAIL_PASSWORD,
+   },
+})
+
+const redisClient = new Redis({
+   host: envVars.REDIS_HOST,
+   port: envVars.REDIS_PORT,
+   username: envVars.REDIS_USERNAME,
+   password: envVars.REDIS_PASSWORD,
+   db: envVars.REDIS_AUTH_DB,
+})
+
+class BasicAuthService {
+   async registration(userData: AuthTypes.LocalRegistrationRequest): Promise<void> {
+      const isDataUnique = await prismaClient.$transaction([
+         userRepository.getUser({ email: userData.email }),
+         userRepository.getUser({ username: userData.username }),
+      ])
+
+      if (isDataUnique[0] || isDataUnique[1]) {
+         throw ApiError.BadRequest('User with this email or username already exists')
+      }
+
+      const hashPassword = await tokensService.hashPassword(userData.password)
+
+      await userRepository.createUser({ ...userData, password: hashPassword })
+   }
+
+   async login(email: string, password: string): Promise<RedirectResponse | AuthTypes.Tokens> {
+      const user = await userRepository.getUser({ email })
+
+      if (!user) {
+         throw ApiError.BadRequest('User with this email does not exist')
+      }
+
+      if (user.provider !== 'local') {
+         throw ApiError.BadRequest(`User has created an account via ${user.provider} service`)
+      }
+
+      const isPasswordValid = await tokensService.compareHashes(password, user.password || undefined)
+      if (!isPasswordValid) {
+         throw ApiError.BadRequest('Invalid email or password')
+      }
+
+      const tokens = tokensService.generateTokens({ userId: user.id })
+
+      if (!user.is_verified_email) {
+         const generatedCode = tokensService.generateCode()
+         await Promise.all([
+            redisClient.set(String(user.id), generatedCode),
+            notificationTransporter.sendMail({
+               from: `"Instagram App" <${envVars.EMAIL_USER}>`,
+               to: user.email,
+               subject: 'Email verification',
+               text: `Your verification code: ${generatedCode}`,
+            }),
+         ])
+         return {
+            url: '/api' + prefix + confirmEmailRoute(user.id),
+            statusCode: 301,
+         }
+      }
+
+      await userRepository.rewriteRefreshToken(user.id, tokens.refresh_token)
+
+      return tokens
+   }
+   async confirmEmail(urlForCode: number, code: number): Promise<Promise<AuthTypes.Tokens>> {
+      const user = await userRepository.getUser({ id: urlForCode })
+
+      if (!user) {
+         throw ApiError.BadRequest('User does not exist')
+      }
+      const codeFromRedis = await redisClient.get(String(urlForCode))
+
+      if (!codeFromRedis || codeFromRedis !== String(code)) {
+         throw ApiError.BadRequest('Invalid code')
+      }
+      const tokens = tokensService.generateTokens({ userId: user.id })
+      await Promise.all([
+         redisClient.del(String(urlForCode)),
+         userRepository.updateUser(user.id, { refresh_token: tokens.refresh_token, is_verified_email: true }),
+      ])
+
+      return tokens
+   }
+   async refreshTokens(id: number, refreshToken: string): Promise<AuthTypes.Tokens> {
+      const user = await userRepository.getUser({ id })
+      if (!user) {
+         throw ApiError.BadRequest('User does not exist')
+      }
+      if (user.refresh_token !== refreshToken) {
+         throw ApiError.BadRequest('Invalid refresh token')
+      }
+
+      const tokens = tokensService.generateTokens({ userId: user.id })
+
+      await userRepository.rewriteRefreshToken(user.id, tokens.refresh_token)
+
+      return tokens
+   }
+   async logout(id: number): Promise<void> {
+      const user = await userRepository.getUser({ id })
+
+      if (!user) {
+         throw ApiError.BadRequest('User does not exist')
+      }
+      await userRepository.rewriteRefreshToken(user.id, null)
+   }
+   async resendCode(urlForCode: number): Promise<void> {
+      const user = await userRepository.getUser({ id: urlForCode })
+      if (!user) {
+         throw ApiError.BadRequest('User does not exist')
+      }
+      if (user.is_verified_email) {
+         throw ApiError.BadRequest('Email is already verified')
+      }
+      const generatedCode = tokensService.generateCode()
+      await Promise.all([
+         redisClient.set(String(user.id), generatedCode),
+         notificationTransporter.sendMail({
+            from: `"Instagram App" <${envVars.EMAIL_USER}>`,
+            to: user.email,
+            subject: 'Email verification',
+            text: `Your verification code: ${generatedCode}`,
+         }),
+      ])
+   }
+}
+
+export default new BasicAuthService()

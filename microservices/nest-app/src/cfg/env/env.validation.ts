@@ -1,15 +1,12 @@
 import { plainToInstance } from 'class-transformer'
 import { IsIn, IsNumber, IsString, validateSync } from 'class-validator'
 
-import { AppEnvs } from '@test_task/types'
+import { AppEnvs } from '@test_task/shared/types'
 import { NotFoundException } from '@nestjs/common'
 
 class EnvironmentVariables implements AppEnvs {
    @IsString()
    CLIENT_URL: string
-
-   @IsString()
-   SESSION_SECRET: string
 
    @IsString()
    JWT_SECRET: string

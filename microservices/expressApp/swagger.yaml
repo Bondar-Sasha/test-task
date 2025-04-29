@@ -1,0 +1,193 @@
+openapi: 3.0.0
+info:
+  title: Authentication API
+  version: 1.0.0
+  description: Authentication API with local, Google and GitHub strategies
+servers:
+  - url: http://localhost:3000
+    description: Local Development Server
+
+components:
+  schemas:
+    RegistrationRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+          maxLength: 15
+        tel:
+          type: string
+          pattern: ^\+[1-9]\d{1,14}$
+        username:
+          type: string
+          minLength: 6
+          maxLength: 15
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 6
+          maxLength: 15
+    ConfirmEmailRequest:
+      type: object
+      required:
+        - code
+      properties:
+        code:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+paths:
+  /api/auth/local/registration:
+    post:
+      tags:
+        - Local Auth
+      summary: Register new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationRequest'
+      responses:
+        '301':
+          description: Redirect to login page
+        '400':
+          description: Bad Request - Invalid data or user already exists
+
+  /api/auth/local/login:
+    patch:
+      tags:
+        - Local Auth
+      summary: User Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '301':
+          description: Redirect to home page
+        '400':
+          description: Invalid credentials
+
+  /api/auth/logout:
+    patch:
+      tags:
+        - Auth
+      summary: User Logout
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Successful logout
+        '401':
+          description: Unauthorized
+
+  /api/auth/refreshTokens:
+    get:
+      tags:
+        - Auth
+      summary: Refresh Access and Refresh tokens
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Tokens refreshed successfully
+        '401':
+          description: Invalid tokens
+
+  /api/auth/confirmEmail/{urlForCode}:
+    post:
+      tags:
+        - Local Auth
+      summary: Confirm email address
+      parameters:
+        - name: urlForCode
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfirmEmailRequest'
+      responses:
+        '200':
+          description: Email confirmed successfully
+        '400':
+          description: Invalid code
+
+  /api/auth/resendCode/{urlForCode}:
+    get:
+      tags:
+        - Local Auth
+      summary: Resend confirmation code
+      parameters:
+        - name: urlForCode
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Code resent successfully
+        '400':
+          description: Invalid request
+
+  /api/auth/google/login:
+    get:
+      tags:
+        - Google Auth
+      summary: Login with Google
+      responses:
+        '302':
+          description: Redirect to Google OAuth
+
+  /api/auth/google/registration:
+    get:
+      tags:
+        - Google Auth
+      summary: Register with Google
+      responses:
+        '302':
+          description: Redirect to Google OAuth
+  /api/auth/github/login:
+    get:
+      tags:
+        - GitHub Auth
+      summary: Login with GitHub
+      responses:
+        '302':
+          description: Redirect to GitHub OAuth
+
+  /api/auth/github/registration:
+    get:
+      tags:
+        - GitHub Auth
+      summary: Register with GitHub
+      responses:
+        '302':
+          description: Redirect to GitHub OAuth
+
