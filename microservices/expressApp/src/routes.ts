@@ -74,7 +74,6 @@ router.post(
 )
 router.get(
    baseAuthUrl + refreshTokensRoute,
-   accessTokenMiddleware,
    refreshTokenMiddleware as RequestHandler,
    localAuthController.refreshTokens as unknown as RequestHandler,
 )
