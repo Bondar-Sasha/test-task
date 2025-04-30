@@ -13,6 +13,7 @@ const {
    localRegistrationRoute,
    localLoginRoute,
    logoutRoute,
+   tokensValidationRoute,
    confirmEmailRoute,
    refreshTokensRoute,
    googleLoginRoute,
@@ -72,6 +73,17 @@ router.post(
    [body('code').notEmpty().withMessage('Code is required'), badRequestMiddleware],
    localAuthController.confirmEmail,
 )
+router.post(
+   baseAuthUrl + tokensValidationRoute,
+   [
+      body('access_token').isString().notEmpty().withMessage('Access token is required'),
+      body('refresh_token').isString().notEmpty().withMessage('Refresh token is required'),
+
+      badRequestMiddleware,
+   ],
+   localAuthController.tokensValidation,
+)
+
 router.get(
    baseAuthUrl + refreshTokensRoute,
    refreshTokenMiddleware as RequestHandler,

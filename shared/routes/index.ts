@@ -9,6 +9,7 @@ export class AppRoutes {
          localRegistrationRoute: '/local/registration',
          localLoginRoute: '/local/login',
          refreshTokensRoute: '/refreshTokens',
+         tokensValidationRoute: '/tokensValidation',
          confirmEmailRoute: (UrlForCode?: string | number) => `/confirmEmail/${UrlForCode || ':urlForCode'}`,
          resendCodeRoute: (UrlForCode?: string | number) => `/resendCode/${UrlForCode || ':urlForCode'}`,
 

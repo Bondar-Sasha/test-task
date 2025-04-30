@@ -1,23 +1,23 @@
-import { NextFunction, Request, Response } from 'express'
+import { Request, Response } from 'express'
 import { AuthenticatedRequest, baseAuthUrl, RedirectResponse, setTokensInCookies } from '../utils'
 import { AuthTypes } from '@test_task/shared/types'
 import { AppRoutes } from '@test_task/shared/routes'
 import localAuthService from '../services/localAuth.service'
+import tokensService from 'src/services/tokens.service'
 
-const { localLoginRoute, confirmEmailRoute } = AppRoutes.authRoutes()
+const { localLoginRoute } = AppRoutes.authRoutes()
 
 const userWithTokensGuard = (data: AuthTypes.Tokens | RedirectResponse): data is RedirectResponse => {
    return 'statusCode' in data
 }
 
 class LocalAuthController {
-   async registration(req: Request, res: Response, next: NextFunction): Promise<void> {
+   async registration(req: Request, res: Response) {
       await localAuthService.registration(req.body)
       res.redirect(301, baseAuthUrl + localLoginRoute)
    }
 
-   async login(req: Request, res: Response): Promise<void> {
-      const { email, password } = req.body
+   async login({ body: { email, password } }: Request, res: Response) {
       const serviceRes = await localAuthService.login(email, password)
 
       if (userWithTokensGuard(serviceRes)) {
@@ -27,35 +27,34 @@ class LocalAuthController {
       res.redirect(302, '/')
    }
 
-   async confirmEmail(req: Request, res: Response): Promise<void> {
-      const urlForCode = parseInt(req.params.urlForCode)
-      const { code } = req.body
-      const { refresh_token, access_token } = await localAuthService.confirmEmail(urlForCode, code)
+   async confirmEmail({ body: { code }, params: { urlForCode } }: Request, res: Response) {
+      const { refresh_token, access_token } = await localAuthService.confirmEmail(parseInt(urlForCode), code)
 
       setTokensInCookies(res, access_token, refresh_token)
       res.redirect(301, '/')
    }
 
-   async refreshTokens(req: AuthenticatedRequest, res: Response): Promise<void> {
-      const { refresh_token, access_token } = await localAuthService.refreshTokens(
-         req.tokenData.userId,
-         req.refresh_token,
-      )
+   async refreshTokens({ tokenData: { userId }, ...req }: AuthenticatedRequest, res: Response) {
+      const { refresh_token, access_token } = await localAuthService.refreshTokens(userId, req.refresh_token)
 
       setTokensInCookies(res, access_token, refresh_token)
       res.json()
    }
-   async resendCode(req: Request, res: Response): Promise<void> {
-      const urlForCode = parseInt(req.params.urlForCode)
-      await localAuthService.resendCode(urlForCode)
-      res.redirect(301, baseAuthUrl + confirmEmailRoute(urlForCode))
+   async resendCode({ params: { urlForCode } }: Request, res: Response) {
+      await localAuthService.resendCode(parseInt(urlForCode))
+      res.json()
    }
 
-   async logout(req: AuthenticatedRequest, res: Response): Promise<void> {
-      await localAuthService.logout(req.tokenData.userId)
+   async logout({ tokenData: { userId } }: AuthenticatedRequest, res: Response) {
+      await localAuthService.logout(userId)
+
       res.clearCookie('refresh_token')
       res.clearCookie('access_token')
       res.json()
+   }
+   tokensValidation({ body: { access_token, refresh_token } }: Request, res: Response) {
+      const { isValidToken } = tokensService
+      res.json({ validation: [isValidToken(access_token), isValidToken(refresh_token)] })
    }
 }
 

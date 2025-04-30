@@ -8,6 +8,10 @@ export namespace AuthTypes {
       refresh_token: string
    }
 
+   export interface ValidationTokensRes {
+      validation: [null | TokensCreatingPayload, null | TokensCreatingPayload]
+   }
+
    export interface UserCreds {
       id: number
       email: string

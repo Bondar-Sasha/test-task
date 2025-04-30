@@ -190,4 +190,46 @@ paths:
       responses:
         '302':
           description: Redirect to GitHub OAuth
+  /api/auth/tokensValidation:
+    post:
+      tags:
+        - Auth
+      summary: Validate tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - access_token
+                - refresh_token
+              properties:
+                access_token:
+                  type: string
+                refresh_token:
+                  type: string
+      responses:
+        '200':
+          description: Tokens validation result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  validation:
+                    type: array
+                    minItems: 2
+                    maxItems: 2
+                    items:
+                      oneOf:
+                        - type: 'null'
+                        - type: object
+                          properties:
+                            userId:
+                              type: number
+                          required:
+                            - userId
+        '400':
+          description: Bad Request - Invalid tokens format
 
