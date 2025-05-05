@@ -1,9 +1,9 @@
 import { NextFunction, Request, Response } from 'express'
-import passport, { AuthenticateOptions } from 'passport'
+import passport from 'passport'
 import { VerifyCallback } from 'passport-oauth2'
-import { Profile, Strategy } from 'passport-google-oauth20'
+import { AuthenticateOptionsGoogle, Profile, Strategy } from 'passport-google-oauth20'
 import envVars from '../services/env.service'
-import { ServiceAuthOptions, setTokensInCookies } from '../utils'
+import { setTokensInCookies } from '../utils'
 import tokensService from '../services/tokens.service'
 import ApiError from '../services/apiErrorsHandler.service'
 import userRepository from '../user.repository'
@@ -21,7 +21,7 @@ class GoogleAuthController {
             passReqToCallback: true,
             scope: ['email', 'profile'],
          },
-         this.afterAuth,
+         this.afterAuth.bind(this),
       )
       passport.use(this.strategy)
    }
@@ -29,10 +29,8 @@ class GoogleAuthController {
    googleAuth(req: Request, res: Response, next: NextFunction): void {
       const action = req.path.includes('registration') ? 'registration' : 'login'
 
-      const options: ServiceAuthOptions = {
-         scope: ['email', 'profile'],
+      const options: AuthenticateOptionsGoogle = {
          state: action,
-         callbackURL: envVars.GOOGLE_CALLBACK_URL,
       }
 
       passport.authenticate('google', options)(req, res, next)
@@ -95,11 +93,10 @@ class GoogleAuthController {
          'google',
          {
             failureRedirect: '/',
-            successRedirect: '/',
+            session: false,
          },
          (err: unknown, tokens: AuthTypes.Tokens) => {
             if (err) {
-               res.redirect(`/`)
                return next(ApiError.BadRequest('Google authentication failed', [err]))
             }
             setTokensInCookies(res, tokens.access_token, tokens.refresh_token)

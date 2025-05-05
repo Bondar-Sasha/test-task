@@ -9,10 +9,11 @@
       "target": "ES2023",
       "sourceMap": true,
       "outDir": "./dist",
-      "baseUrl": ".",
+      "baseUrl": "src",
       "paths": {
-         "@cfg": ["src/cfg/index"],
-         "@utils": ["src/utils/index"]
+         "@test_task/shared/*": ["../../shared/*"],
+         "@cfg": ["cfg/index"],
+         "@utils": ["utils/index"]
       },
       "incremental": true,
       "skipLibCheck": true,

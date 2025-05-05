@@ -22,7 +22,7 @@ class GithubAuthController {
             passReqToCallback: true,
             scope: ['user:email'],
          },
-         this.afterAuth,
+         this.afterAuth.bind(this),
       )
       passport.use(this.strategy)
    }

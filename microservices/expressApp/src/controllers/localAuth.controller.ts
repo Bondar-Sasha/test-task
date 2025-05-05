@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { AuthenticatedRequest, baseAuthUrl, RedirectResponse, setTokensInCookies } from '../utils'
+import { baseAuthUrl, RedirectResponse, setTokensInCookies } from '../utils'
 import { AuthTypes } from '@test_task/shared/types'
 import { AppRoutes } from '@test_task/shared/routes'
 import localAuthService from '../services/localAuth.service'
@@ -34,7 +34,7 @@ class LocalAuthController {
       res.redirect(301, '/')
    }
 
-   async refreshTokens({ tokenData: { userId }, ...req }: AuthenticatedRequest, res: Response) {
+   async refreshTokens({ tokenData: { userId }, ...req }: AuthTypes.AuthenticatedRequest, res: Response) {
       const { refresh_token, access_token } = await localAuthService.refreshTokens(userId, req.refresh_token)
 
       setTokensInCookies(res, access_token, refresh_token)
@@ -45,7 +45,7 @@ class LocalAuthController {
       res.json()
    }
 
-   async logout({ tokenData: { userId } }: AuthenticatedRequest, res: Response) {
+   async logout({ tokenData: { userId } }: AuthTypes.AuthenticatedRequest, res: Response) {
       await localAuthService.logout(userId)
 
       res.clearCookie('refresh_token')

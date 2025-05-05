@@ -22,4 +22,13 @@ export class AppRoutes {
          googleLoginRoute: '/google/login',
       }
    }
+   static userProfileRoutes() {
+      return {
+         prefix: '/user-profile',
+         getRoute: (id?: string | number) => `/get/${id || ':id'}`,
+         createRoute: '/get',
+         updateRoute: '/update',
+         deleteRoute: '/delete',
+      }
+   }
 }

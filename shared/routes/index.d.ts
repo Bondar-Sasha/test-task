@@ -6,15 +6,21 @@ export declare class AppRoutes {
         localRegistrationRoute: string;
         localLoginRoute: string;
         refreshTokensRoute: string;
+        tokensValidationRoute: string;
         confirmEmailRoute: (UrlForCode?: string | number) => string;
-        resendCodeRoute: string;
+        resendCodeRoute: (UrlForCode?: string | number) => string;
         githubRegisterRoute: string;
         githubLoginRoute: string;
-        githubRegisterCallbackRoute: string;
-        githubLoginCallbackRoute: string;
+        githubCallbackRoute: string;
+        googleCallbackRoute: string;
         googleRegisterRoute: string;
         googleLoginRoute: string;
-        googleRegisterCallbackRoute: string;
-        googleLoginCallbackRoute: string;
+    };
+    static userProfileRoutes(): {
+        prefix: string;
+        getRoute: (id?: string | number) => string;
+        createRoute: string;
+        updateRoute: string;
+        deleteRoute: string;
     };
 }

@@ -18,6 +18,8 @@ model User {
   refresh_token     String?
   username          String?  @unique
   password          String?
+
+  @@map("user")
 }
 
 enum Role {

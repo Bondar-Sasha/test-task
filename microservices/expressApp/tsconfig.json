@@ -6,7 +6,6 @@
       "esModuleInterop": true,
       "allowSyntheticDefaultImports": true,
       "isolatedModules": true,
-      "moduleDetection": "force",
       "strict": true,
       "noEmit": false,
       "outDir": "./dist",
@@ -17,15 +16,12 @@
       "composite": true,
       "skipLibCheck": true,
       "rootDir": ".",
-      "baseUrl": ".",
-      "paths": {
-         "@test_task/shared/*": ["../../shared"]
-      }
+      "baseUrl": "."
    },
    "ts-node": {
       "esm": true,
       "experimentalSpecifierResolution": "node"
    },
-   "include": ["src/**/*", "../../shared/**/*"],
+   "include": ["src/**/*"],
    "references": [{ "path": "../../shared/tsconfig.json" }]
 }

@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { EnvService } from '@cfg'
+import { UserEntity } from './entities'
+import { UserCredsRepository } from './repositories'
 
 @Module({
    imports: [
@@ -13,7 +15,6 @@ import { EnvService } from '@cfg'
 
             return {
                type: 'postgres',
-               name: 'postgres',
                host: POSTGRES_HOST,
                port: POSTGRES_PORT,
                username: POSTGRES_USER,
@@ -22,12 +23,13 @@ import { EnvService } from '@cfg'
                autoLoadEntities: true,
                synchronize: envService.getAppMode() === 'development',
                logging: envService.getAppMode() === 'development',
+               entities: [UserEntity],
             }
          },
       }),
-      TypeOrmModule.forFeature([]),
+      TypeOrmModule.forFeature([UserEntity]),
    ],
-   providers: [],
-   exports: [],
+   providers: [UserCredsRepository],
+   exports: [UserCredsRepository],
 })
 export class PostgresModule {}

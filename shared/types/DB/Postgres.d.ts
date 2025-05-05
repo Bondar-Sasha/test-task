@@ -1,4 +1,15 @@
 export declare namespace Postgres {
+    interface IGetUserProfile {
+        id: number;
+        email: string;
+        role: 'user' | 'admin';
+        tel?: string;
+        username: string;
+    }
+    interface UpdateUserSnapshot {
+        tel: string;
+        username: string;
+    }
     interface UserSnapshot {
         id: number;
         email: string;

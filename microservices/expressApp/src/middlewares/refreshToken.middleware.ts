@@ -1,9 +1,13 @@
 import { NextFunction, Request, Response } from 'express'
 import ApiError from '../services/apiErrorsHandler.service'
 import tokensService from '../services/tokens.service'
-import { AuthenticatedRequest } from '../utils'
+import { AuthTypes } from '@test_task/shared/types'
 
-export default function refreshTokenMiddleware(req: AuthenticatedRequest, _res: Response, next: NextFunction) {
+export default function refreshTokenMiddleware(
+   req: AuthTypes.AuthenticatedRequest,
+   _res: Response,
+   next: NextFunction,
+) {
    const refreshToken = req.cookies?.refresh_token
 
    if (!refreshToken) {

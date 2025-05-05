@@ -1,9 +1,9 @@
 {
    "name": "@test_task/shared",
    "version": "1.0.0",
-   "description": "",
-   "type": "module",
+   "description": "Shared types and routes",
    "keywords": [],
+   "main": "src",
    "author": "",
    "license": "ISC",
    "dependencies": {

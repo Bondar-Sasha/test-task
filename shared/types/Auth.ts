@@ -1,3 +1,5 @@
+import { Request } from 'express'
+
 export namespace AuthTypes {
    export interface TokensCreatingPayload {
       userId: number
@@ -5,6 +7,10 @@ export namespace AuthTypes {
 
    export interface Tokens {
       access_token: string
+      refresh_token: string
+   }
+   export interface AuthenticatedRequest extends Request {
+      tokenData: TokensCreatingPayload
       refresh_token: string
    }
 
