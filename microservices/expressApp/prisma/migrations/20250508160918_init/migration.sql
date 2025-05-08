@@ -5,7 +5,7 @@ CREATE TYPE "Role" AS ENUM ('user', 'admin');
 CREATE TYPE "Provider" AS ENUM ('google', 'github', 'local');
 
 -- CreateTable
-CREATE TABLE "User" (
+CREATE TABLE "user" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
     "role" "Role" NOT NULL DEFAULT 'user',
@@ -16,20 +16,14 @@ CREATE TABLE "User" (
     "username" TEXT,
     "password" TEXT,
 
-    CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
+CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_tel_key" ON "User"("tel");
+CREATE UNIQUE INDEX "user_tel_key" ON "user"("tel");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
-
--- CreateIndex
-CREATE INDEX "User_email_idx" ON "User"("email");
-
--- CreateIndex
-CREATE INDEX "User_username_idx" ON "User"("username");
+CREATE UNIQUE INDEX "user_username_key" ON "user"("username");

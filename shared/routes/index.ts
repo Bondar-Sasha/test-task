@@ -8,8 +8,7 @@ export class AppRoutes {
          logoutRoute: '/logout',
          localRegistrationRoute: '/local/registration',
          localLoginRoute: '/local/login',
-         refreshTokensRoute: '/refreshTokens',
-         tokensValidationRoute: '/tokensValidation',
+         tokensValidationAndRefreshingRoute: '/tokensValidationAndRefreshing',
          confirmEmailRoute: (UrlForCode?: string | number) => `/confirmEmail/${UrlForCode || ':urlForCode'}`,
          resendCodeRoute: (UrlForCode?: string | number) => `/resendCode/${UrlForCode || ':urlForCode'}`,
 

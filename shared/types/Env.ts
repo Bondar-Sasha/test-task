@@ -2,29 +2,16 @@ export interface AppEnvs {
    APP_MODE: 'development' | 'production'
    CLIENT_URL: string
    JWT_SECRET: string
+   ACCESS_TOKEN_EXPIRES_IN: string
+   REFRESH_TOKEN_EXPIRES_IN: string
 
    EXPRESS_APP_PORT: number
    NEST_APP_PORT: number
 
-   POSTGRES_HOST_AUTH_METHOD: string
-   POSTGRES_USER: string
-   POSTGRES_PASSWORD: string
-   POSTGRES_HOST: string
-   POSTGRES_DB: string
-   POSTGRES_PORT: number
-
-   REDIS_USERNAME: string
-   REDIS_PASSWORD: string
-   REDIS_HOST: string
-   REDIS_PORT: number
-   REDIS_AUTH_DB: number
-
-   MONGO_INITDB_ROOT_USERNAME: string
-   MONGO_INITDB_ROOT_PASSWORD: string
-   MONGO_INITDB_DATABASE: string
-   MONGO_LOG_LEVEL: string
-   MONGO_HOST: string
-   MONGO_PORT: number
+   COMMON_POSTGRES_DB_URL: string
+   AUTH_POSTGRES_DB_URL: string
+   REDIS_AUTH_DB_URL: string
+   MONGO_DB_URL: string
 
    EMAIL_HOST: string
    EMAIL_PORT: number

@@ -55,7 +55,6 @@ class GithubAuthController {
 
          const email = profile.emails?.[0]?.value
 
-         console.log(email)
          if (!email) {
             return done(ApiError.BadRequest('Email not provided by Github'))
          }

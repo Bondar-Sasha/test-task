@@ -1,15 +1,11 @@
 import { Request, Response } from 'express'
-import { baseAuthUrl, RedirectResponse, setTokensInCookies } from '../utils'
+import { baseAuthUrl, setTokensInCookies } from '../utils'
 import { AuthTypes } from '@test_task/shared/types'
 import { AppRoutes } from '@test_task/shared/routes'
 import localAuthService from '../services/localAuth.service'
-import tokensService from 'src/services/tokens.service'
+import { userWithTokensGuard } from 'src/utils/tokensGuard.guard'
 
 const { localLoginRoute } = AppRoutes.authRoutes()
-
-const userWithTokensGuard = (data: AuthTypes.Tokens | RedirectResponse): data is RedirectResponse => {
-   return 'statusCode' in data
-}
 
 class LocalAuthController {
    async registration(req: Request, res: Response) {
@@ -34,12 +30,6 @@ class LocalAuthController {
       res.redirect(301, '/')
    }
 
-   async refreshTokens({ tokenData: { userId }, ...req }: AuthTypes.AuthenticatedRequest, res: Response) {
-      const { refresh_token, access_token } = await localAuthService.refreshTokens(userId, req.refresh_token)
-
-      setTokensInCookies(res, access_token, refresh_token)
-      res.json()
-   }
    async resendCode({ params: { urlForCode } }: Request, res: Response) {
       await localAuthService.resendCode(parseInt(urlForCode))
       res.json()
@@ -52,9 +42,8 @@ class LocalAuthController {
       res.clearCookie('access_token')
       res.json()
    }
-   tokensValidation({ body: { access_token, refresh_token } }: Request, res: Response) {
-      const { isValidToken } = tokensService
-      res.json({ validation: [isValidToken(access_token), isValidToken(refresh_token)] })
+   tokensValidationAndRefresh(_req: Request, res: Response) {
+      res.json()
    }
 }
 

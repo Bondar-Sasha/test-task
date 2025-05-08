@@ -2,8 +2,8 @@ import express, { RequestHandler } from 'express'
 import { body } from 'express-validator'
 import localAuthController from './controllers/localAuth.controller'
 import { AppRoutes } from '@test_task/shared/routes'
-import accessTokenMiddleware from './middlewares/accessToken.middleware'
-import refreshTokenMiddleware from './middlewares/refreshToken.middleware'
+import universalTokenMiddleware from './middlewares/universalToken.middleware'
+
 import { baseAuthUrl } from './utils'
 import badRequestMiddleware from './middlewares/badRequest.middleware'
 import googleAuthController from './controllers/googleAuth.controller'
@@ -13,9 +13,8 @@ const {
    localRegistrationRoute,
    localLoginRoute,
    logoutRoute,
-   tokensValidationRoute,
+   tokensValidationAndRefreshingRoute,
    confirmEmailRoute,
-   refreshTokensRoute,
    googleLoginRoute,
    googleRegisterRoute,
    googleCallbackRoute,
@@ -28,7 +27,6 @@ const {
 } = AppRoutes.authRoutes()
 
 const router = express.Router()
-
 router.post(
    baseAuthUrl + localRegistrationRoute,
    [
@@ -73,26 +71,15 @@ router.post(
    [body('code').notEmpty().withMessage('Code is required'), badRequestMiddleware],
    localAuthController.confirmEmail,
 )
-router.post(
-   baseAuthUrl + tokensValidationRoute,
-   [
-      body('access_token').isString().notEmpty().withMessage('Access token is required'),
-      body('refresh_token').isString().notEmpty().withMessage('Refresh token is required'),
-
-      badRequestMiddleware,
-   ],
-   localAuthController.tokensValidation,
-)
-
 router.get(
-   baseAuthUrl + refreshTokensRoute,
-   refreshTokenMiddleware as RequestHandler,
-   localAuthController.refreshTokens as unknown as RequestHandler,
+   baseAuthUrl + tokensValidationAndRefreshingRoute,
+   universalTokenMiddleware(true) as RequestHandler,
+   localAuthController.tokensValidationAndRefresh,
 )
+
 router.patch(
    baseAuthUrl + logoutRoute,
-   accessTokenMiddleware,
-   refreshTokenMiddleware as RequestHandler,
+   universalTokenMiddleware(false) as RequestHandler,
    localAuthController.logout as unknown as RequestHandler,
 )
 

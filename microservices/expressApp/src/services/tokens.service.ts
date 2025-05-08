@@ -7,10 +7,10 @@ import envVars from './env.service'
 class TokensService {
    generateTokens(payload: AuthTypes.TokensCreatingPayload): AuthTypes.Tokens {
       const access_token = jwt.sign(payload, envVars.JWT_SECRET, {
-         expiresIn: '10m',
+         expiresIn: envVars.ACCESS_TOKEN_EXPIRES_IN,
       })
       const refresh_token = jwt.sign(payload, envVars.JWT_SECRET, {
-         expiresIn: '30d',
+         expiresIn: envVars.REFRESH_TOKEN_EXPIRES_IN,
       })
       return {
          access_token,

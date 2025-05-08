@@ -1,4 +1,3 @@
-import { createTransport } from 'nodemailer'
 import Redis from 'ioredis'
 
 import { AuthTypes } from '@test_task/shared/types'
@@ -9,25 +8,11 @@ import { prismaClient } from '..'
 import ApiError from './apiErrorsHandler.service'
 import { RedirectResponse } from '../utils'
 import userRepository from '../user.repository'
+import emailService from './email.service'
 
 const { prefix, confirmEmailRoute } = AppRoutes.authRoutes()
 
-const notificationTransporter = createTransport({
-   host: envVars.EMAIL_HOST,
-   port: envVars.EMAIL_PORT,
-   auth: {
-      user: envVars.EMAIL_USER,
-      pass: envVars.EMAIL_PASSWORD,
-   },
-})
-
-const redisClient = new Redis({
-   host: envVars.REDIS_HOST,
-   port: envVars.REDIS_PORT,
-   username: envVars.REDIS_USERNAME,
-   password: envVars.REDIS_PASSWORD,
-   db: envVars.REDIS_AUTH_DB,
-})
+const redisClient = new Redis(envVars.REDIS_AUTH_DB_URL)
 
 class BasicAuthService {
    async registration(userData: AuthTypes.LocalRegistrationRequest): Promise<void> {
@@ -65,12 +50,7 @@ class BasicAuthService {
          const generatedCode = tokensService.generateCode()
          await Promise.all([
             redisClient.set(String(user.id), generatedCode),
-            notificationTransporter.sendMail({
-               from: `"Instagram App" <${envVars.EMAIL_USER}>`,
-               to: user.email,
-               subject: 'Email verification',
-               text: `Your verification code: ${generatedCode}`,
-            }),
+            emailService.sendMail(user.email, 'Email verification', `Your verification code: ${generatedCode}`),
          ])
          return {
             url: '/api' + prefix + confirmEmailRoute(user.id),
@@ -136,12 +116,7 @@ class BasicAuthService {
       const generatedCode = tokensService.generateCode()
       await Promise.all([
          redisClient.set(String(user.id), generatedCode),
-         notificationTransporter.sendMail({
-            from: `"Instagram App" <${envVars.EMAIL_USER}>`,
-            to: user.email,
-            subject: 'Email verification',
-            text: `Your verification code: ${generatedCode}`,
-         }),
+         emailService.sendMail(user.email, 'Email verification', `Your verification code: ${generatedCode}`),
       ])
    }
 }

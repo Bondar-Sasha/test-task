@@ -1,11 +1,14 @@
-import swaggerUi from 'swagger-ui-express'
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import yaml from 'js-yaml'
 
-const swaggerDocument = yaml.load(readFileSync(join(process.cwd(), '.', 'swagger.yaml'), 'utf8')) as Record<
-   string,
-   unknown
->
+export function loadSwaggerDocument() {
+   const filePath = join(process.cwd(), 'src/swagger.json')
 
-export { swaggerUi, swaggerDocument }
+   try {
+      const fileContents = readFileSync(filePath, 'utf8')
+      return JSON.parse(fileContents) as Record<string, unknown>
+   } catch (error) {
+      console.error('Failed to load Swagger document:', error)
+      throw new Error(`Could not load Swagger JSON file at ${filePath}`)
+   }
+}
