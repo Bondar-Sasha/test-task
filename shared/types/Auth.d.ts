@@ -9,18 +9,6 @@ export declare namespace AuthTypes {
     }
     interface AuthenticatedRequest extends Request {
         tokenData: TokensCreatingPayload;
-        refresh_token: string;
-    }
-    interface ValidationTokensRes {
-        validation: [null | TokensCreatingPayload, null | TokensCreatingPayload];
-    }
-    interface UserCreds {
-        id: number;
-        email: string;
-        role: 'user' | 'admin';
-        username: string;
-        provider: 'google' | 'github' | 'local';
-        tel?: string;
     }
     interface LocalRegistrationRequest {
         email: string;
@@ -34,5 +22,9 @@ export declare namespace AuthTypes {
     }
     interface ConfirmEmailRequest {
         code: number;
+    }
+    interface DeleteUserRequest {
+        id: number;
+        soft_delete_date: Date;
     }
 }

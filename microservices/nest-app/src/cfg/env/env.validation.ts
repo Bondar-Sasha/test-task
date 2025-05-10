@@ -4,7 +4,7 @@ import { IsIn, IsNumber, IsString, validateSync } from 'class-validator'
 import { AppEnvs } from '@test_task/shared/types'
 import { NotFoundException } from '@nestjs/common'
 
-class EnvironmentVariables implements AppEnvs {
+class EnvironmentVariables {
    @IsString()
    CLIENT_URL: string
 
@@ -12,7 +12,7 @@ class EnvironmentVariables implements AppEnvs {
    JWT_SECRET: string
 
    @IsString()
-   @IsIn(['development', 'production'] satisfies Array<AppEnvs['APP_MODE']>)
+   @IsIn(['development', 'production'])
    APP_MODE: AppEnvs['APP_MODE']
 
    @IsNumber()
@@ -21,41 +21,10 @@ class EnvironmentVariables implements AppEnvs {
    EXPRESS_APP_PORT: number
 
    @IsString()
-   POSTGRES_USER: string
-   @IsString()
-   POSTGRES_PASSWORD: string
-   @IsString()
-   POSTGRES_HOST_AUTH_METHOD: string
-   @IsString()
-   POSTGRES_DB: string
-   @IsString()
-   POSTGRES_HOST: string
-   @IsNumber()
-   POSTGRES_PORT: number
+   COMMON_POSTGRES_DB_URL: string
 
    @IsString()
-   REDIS_HOST: string
-   @IsString()
-   REDIS_USERNAME: string
-   @IsNumber()
-   REDIS_PORT: number
-   @IsString()
-   REDIS_PASSWORD: string
-   @IsNumber()
-   REDIS_AUTH_DB: number
-
-   @IsString()
-   MONGO_INITDB_ROOT_USERNAME: string
-   @IsString()
-   MONGO_INITDB_ROOT_PASSWORD: string
-   @IsString()
-   MONGO_INITDB_DATABASE: string
-   @IsString()
-   MONGO_LOG_LEVEL: string
-   @IsString()
-   MONGO_HOST: string
-   @IsNumber()
-   MONGO_PORT: number
+   MONGO_DB_URL: string
 
    @IsString()
    EMAIL_HOST: string
@@ -65,20 +34,6 @@ class EnvironmentVariables implements AppEnvs {
    EMAIL_USER: string
    @IsString()
    EMAIL_PASSWORD: string
-
-   @IsString()
-   GOOGLE_CLIENT_ID: string
-   @IsString()
-   GOOGLE_CLIENT_SECRET: string
-   @IsString()
-   GOOGLE_CALLBACK_URL: string
-
-   @IsString()
-   GITHUB_CLIENT_ID: string
-   @IsString()
-   GITHUB_CLIENT_SECRET: string
-   @IsString()
-   GITHUB_CALLBACK_URL: string
 }
 
 export function validate(config: AppEnvs): EnvironmentVariables {

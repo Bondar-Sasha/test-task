@@ -15,7 +15,7 @@ export enum Provider {
 @Unique(['email'])
 @Unique(['tel'])
 @Unique(['username'])
-export class UserEntity implements Postgres.UserSnapshot {
+export class UserEntity  {
    @PrimaryGeneratedColumn()
    id: number
 

@@ -1,27 +1,18 @@
 import { Module } from '@nestjs/common'
 import { RedisModule as ExternalRedisModule } from '@nestjs-modules/ioredis'
 
-import { EnvService } from '@cfg'
+import { ConfigService } from '@nestjs/config'
 
 @Module({
    imports: [
       ExternalRedisModule.forRootAsync({
-         useFactory: (envService: EnvService) => {
-            const { REDIS_AUTH_DB, REDIS_HOST, REDIS_PORT, REDIS_USERNAME, REDIS_PASSWORD } =
-               envService.getRedisCredentials()
-
+         inject: [ConfigService],
+         useFactory: (cfgService: ConfigService) => {
             return {
                type: 'single',
-               options: {
-                  password: REDIS_PASSWORD,
-                  username: REDIS_USERNAME,
-                  port: REDIS_PORT,
-                  host: REDIS_HOST,
-                  db: REDIS_AUTH_DB,
-               },
+               url: cfgService.get('REDIS_AUTH_DB_URL'),
             }
          },
-         inject: [EnvService],
       }),
    ],
 })

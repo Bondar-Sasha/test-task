@@ -1,20 +1,19 @@
 import { Postgres } from '@test_task/shared/types'
 import { prismaClient } from '.'
 
-type UserSearchingCondition = { id: number } | { email: string } | { username: string | undefined }
-
+type UserSearchingCondition = { id: number }
 class UserRepository {
    getUser(condition: UserSearchingCondition) {
       return prismaClient.user.findUnique({ where: condition })
    }
-   createUser(user: Postgres.MakeUserSnapshot) {
+   createUser(user: Postgres.MakeUserCredsSnapshot) {
       return prismaClient.user.create({ data: user })
    }
-   updateUser(id: number, user: Partial<Postgres.MakeUserSnapshot>) {
+   updateUser(id: number, user: Postgres.MakeUserCredsSnapshot) {
       return prismaClient.user.update({ where: { id }, data: user })
    }
-   rewriteRefreshToken(id: number, refreshToken?: string | null) {
-      return prismaClient.user.update({ where: { id }, data: { refresh_token: refreshToken } })
+   usersSoftDeleteTrigger() {
+      return prismaClient.$executeRaw`SELECT clean_deleted_users();`
    }
 }
 

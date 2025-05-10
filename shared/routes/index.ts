@@ -25,7 +25,7 @@ export class AppRoutes {
       return {
          prefix: '/user-profile',
          getRoute: (id?: string | number) => `/get/${id || ':id'}`,
-         createRoute: '/get',
+         deleteTriggerRoute: '/delete/trigger',
          updateRoute: '/update',
          deleteRoute: '/delete',
       }

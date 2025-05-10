@@ -3,15 +3,15 @@ import * as cookieParser from 'cookie-parser'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { ClassSerializerInterceptor, Logger, ValidationPipe } from '@nestjs/common'
 import { json } from 'express'
+import { ConfigService } from '@nestjs/config'
 
 import { AppModule } from './app.module'
-import { EnvService } from '@cfg'
 import { HttpExceptionFilter } from '@utils'
 
 async function bootstrap() {
    const app = await NestFactory.create(AppModule)
 
-   const envService = app.get(EnvService)
+   const envService = app.get(ConfigService)
    app.use(json())
    app.use(cookieParser())
 
@@ -27,7 +27,7 @@ async function bootstrap() {
    app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector), { excludeExtraneousValues: true }))
 
    app.enableCors({
-      origin: [envService.getClientUrl()],
+      origin: [envService.get('CLIENT_URL')],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       credentials: true,
    })
@@ -37,31 +37,31 @@ async function bootstrap() {
 
    app.setGlobalPrefix('api')
 
-   const config = new DocumentBuilder()
-      .setTitle('App')
-      .setDescription('API description')
-      .setVersion('1.0')
-      .addTag('Instagram App')
-      .addServer(envService.getClientUrl(), 'Local Development')
-      .addBearerAuth({ type: 'oauth2' })
-      .build()
+   if (envService.get('APP_MODE') === 'development') {
+      const config = new DocumentBuilder()
+         .setTitle('App')
+         .setDescription('API description')
+         .setVersion('1.0')
+         .addTag('Instagram App')
+         .build()
 
-   const documentFactory = () => SwaggerModule.createDocument(app, config)
+      const documentFactory = () => SwaggerModule.createDocument(app, config)
 
-   const swaggerUIOptions = {
-      swaggerOptions: {
-         followRedirects: true,
-         redirectDepth: 5,
-         persistAuthorization: true,
-         displayRequestDuration: true,
-         filter: true,
-      },
+      const swaggerUIOptions = {
+         swaggerOptions: {
+            followRedirects: true,
+            redirectDepth: 5,
+            persistAuthorization: true,
+            displayRequestDuration: true,
+            filter: true,
+         },
 
-      customSiteTitle: 'App API Documentation',
+         customSiteTitle: 'App API Documentation',
+      }
+
+      SwaggerModule.setup('/api/docs', app, documentFactory, swaggerUIOptions)
    }
 
-   SwaggerModule.setup('/api/docs', app, documentFactory, swaggerUIOptions)
-
-   await app.listen(envService.getAppPort())
+   await app.listen(envService.get<string>('NEST_APP_PORT')!)
 }
 void bootstrap()

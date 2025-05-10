@@ -7,7 +7,6 @@ services:
          - '${MONGO_PORT}:${MONGO_PORT}'
       volumes:
          - mongo-db-data:/data/db
-
    redis:
       image: redis:latest
       working_dir: /data
@@ -32,9 +31,11 @@ services:
          - POSTGRES_PORT=${AUTH_POSTGRES_PORT}
       ports:
          - '${AUTH_POSTGRES_PORT}:${AUTH_POSTGRES_PORT}'
-
       volumes:
          - postgres-auth-data:/var/lib/postgresql/data
+         - ./auth-postgres-init.sql:/docker-entrypoint-initdb.d/auth-postgres-init.sql
+
+      command: ['postgres', '-p', '${AUTH_POSTGRES_PORT}']
 
    postgres-common:
       image: postgres:17-alpine
@@ -50,6 +51,7 @@ services:
          - '${COMMON_POSTGRES_PORT}:${COMMON_POSTGRES_PORT}'
       volumes:
          - postgres-common-data:/var/lib/postgresql/data
+      command: ['postgres', '-p', '${COMMON_POSTGRES_PORT}']
 
 volumes:
    postgres-auth-data:

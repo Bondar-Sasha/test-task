@@ -1,74 +1,61 @@
-import { resolve } from 'path'
+import path from 'path'
 import { fileURLToPath } from 'url'
-import { dirname } from 'path'
-import dotenv from 'dotenv'
 
-dotenv.config({ path: resolve(process.cwd(), '../../.env') })
-
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 export default {
    mode: 'production',
-   entry: './src/index.ts',
    target: 'node',
-   output: {
-      filename: 'index.js',
-      path: resolve(__dirname, 'dist'),
-      clean: true,
-      library: {
-         type: 'module',
-      },
-   },
+   entry: './src/index.ts',
    experiments: {
       outputModule: true,
    },
-   resolve: {
-      extensions: ['.js', '.ts'],
-      alias: {
-         '@test_task/shared/*': resolve(__dirname, '../../shared/'),
-      },
-   },
+   externalsType: 'module',
    externals: {
-      'node-gyp': 'commonjs node-gyp',
-      'aws-sdk': 'commonjs aws-sdk',
-      'mock-aws-s3': 'commonjs mock-aws-s3',
-      nock: 'commonjs nock',
-      npm: 'commonjs npm',
-      bcrypt: 'commonjs bcrypt',
+      'node-gyp': 'module node-gyp',
+      npm: 'module npm',
+      'mock-aws-s3': 'module mock-aws-s3',
+      'aws-sdk': 'module aws-sdk',
+      nock: 'module nock',
+      bcrypt: 'module bcrypt',
+   },
+   externalsPresets: {
+      node: true,
    },
    module: {
       rules: [
          {
             test: /\.ts$/,
-            exclude: /node_modules/,
             use: {
                loader: 'ts-loader',
                options: {
-                  // Allow importing files outside rootDir
                   compilerOptions: {
-                     baseUrl: __dirname,
-                     paths: {
-                        '@test_task/shared/*': ['../../shared/*'],
-                     },
+                     declaration: false,
                   },
                },
             },
-         },
-         {
-            test: /\.js$/,
             exclude: /node_modules/,
-            use: {
-               loader: 'babel-loader',
-               options: {
-                  presets: ['@babel/preset-env', '@babel/preset-typescript'],
-               },
-            },
          },
       ],
    },
-   // Ignore warnings about critical dependencies
-   ignoreWarnings: [
-      /Critical dependency: the request of a dependency is an expression/,
-      /Module not found: Error: Can't resolve/,
-   ],
+   resolve: {
+      extensions: ['.ts', '.js', '.json'],
+      alias: {
+         src: path.resolve(__dirname, 'src'),
+         '@test_task/shared': path.resolve(__dirname, '../../shared'),
+      },
+   },
+   output: {
+      filename: 'index.mjs',
+      path: path.resolve(__dirname, 'dist'),
+      module: true,
+      clean: true,
+      library: {
+         type: 'module',
+      },
+   },
+   optimization: {
+      minimize: false,
+   },
 }

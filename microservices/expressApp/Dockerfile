@@ -2,15 +2,15 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json ./
-COPY src ./src                    
-COPY webpack.config.js ./
+COPY package.json .
 
-RUN npm i
+RUN npm install
+
+COPY tsconfig.json .
+COPY src ./src
+COPY webpack.config.js .
 
 RUN npm run build
-
-RUN npm prune --omit=dev
 
 FROM node:18-alpine
 
@@ -18,7 +18,8 @@ WORKDIR /app
 
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package.json ./package.json
 
 EXPOSE $EXPRESS_APP_PORT
 
-CMD ["node", "dist/index.mjs"]
+CMD ["npm run prod"]

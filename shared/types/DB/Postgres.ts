@@ -1,35 +1,20 @@
 export namespace Postgres {
-  export interface IGetUserProfile {
+   export interface UserCredsSnapshot {
       id: number
-      email: string
-      role: 'user' | 'admin'
-      tel?: string
-      username: string
-   }
-
-   export interface UpdateUserSnapshot {
-      tel: string
-      username: string
-   }
-   export interface UserSnapshot {
-      id: number
-      email: string
       role: 'user' | 'admin'
       provider: 'google' | 'github' | 'local'
       is_verified_email: boolean
       refresh_token?: string | null
-      tel?: string
-      username?: string
-      password?: string
+      password?: string | null
+      soft_delete_date?: Date | null
    }
-   export interface MakeUserSnapshot {
-      email: string
+
+   export interface MakeUserCredsSnapshot {
       role?: 'user' | 'admin'
       provider?: 'google' | 'github' | 'local'
       is_verified_email?: boolean
-      refresh_token?: string
-      tel?: string
-      username?: string
+      refresh_token?: string | null
       password?: string
+      soft_delete_date?: Date
    }
 }

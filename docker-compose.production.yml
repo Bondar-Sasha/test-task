@@ -39,6 +39,7 @@ services:
          - postgres-auth-data:/var/lib/postgresql/data
       networks:
          - express-network
+      command: ['postgres', '-p', '${AUTH_POSTGRES_PORT}']
 
    postgres-common:
       image: postgres:17-alpine
@@ -53,6 +54,7 @@ services:
          - postgres-common-data:/var/lib/postgresql/data
       networks:
          - nest-network
+      command: ['postgres', '-p', '${COMMON_POSTGRES_PORT}']
 
    express:
       restart: unless-stopped

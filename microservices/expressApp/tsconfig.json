@@ -2,26 +2,18 @@
    "compilerOptions": {
       "target": "ES2020",
       "module": "CommonJS",
-      "moduleResolution": "node",
+      "moduleResolution": "Node",
       "esModuleInterop": true,
-      "allowSyntheticDefaultImports": true,
-      "isolatedModules": true,
       "strict": true,
-      "noEmit": false,
-      "outDir": "./dist",
-      "noUnusedLocals": false,
-      "noUnusedParameters": false,
-      "noFallthroughCasesInSwitch": true,
-      "noUncheckedSideEffectImports": true,
-      "composite": true,
       "skipLibCheck": true,
-      "rootDir": ".",
-      "baseUrl": "."
+      "outDir": "./dist",
+      "baseUrl": ".",
+      "paths": {
+         "src/*": ["./src/*"],
+         "@test_task/shared/*": ["../../shared/*"]
+      },
+      "rootDirs": ["./src", "../../shared"]
    },
-   "ts-node": {
-      "esm": true,
-      "experimentalSpecifierResolution": "node"
-   },
-   "include": ["src/**/*"],
-   "references": [{ "path": "../../shared/tsconfig.json" }]
+   "include": ["src/**/*", "../../shared/**/*"],
+   "exclude": ["node_modules", "dist"]
 }

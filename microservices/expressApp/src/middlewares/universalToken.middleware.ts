@@ -23,7 +23,6 @@ export default (autoRefresh: boolean) =>
             throw ApiError.UnAuthorizedError()
          }
          if (accessTokenValidationData) {
-            req.refresh_token = refreshToken
             req.tokenData = refreshTokenValidationData
             return next()
          }
@@ -38,7 +37,6 @@ export default (autoRefresh: boolean) =>
 
          setTokensInCookies(res, access_token, refresh_token)
 
-         req.refresh_token = refresh_token
          req.tokenData = refreshTokenValidationData
          next()
       } catch (error) {

@@ -5,12 +5,12 @@ import { UserEntity } from '../entities'
 import { Postgres } from '@test_task/shared/types'
 
 @Injectable()
-export class UserCredsRepository extends Repository<Postgres.UserSnapshot> {
+export class UserCredsRepository extends Repository<Postgres.UserCredsSnapshot> {
    constructor(@InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>) {
       super(userRepository.target, userRepository.manager, userRepository.queryRunner)
    }
 
-   async getUser(id: number): Promise<Postgres.IGetUserProfile | null> {
+   async getUser(id: number) {
       const res = await this.userRepository.findOne({
          where: { id },
          select: ['id', 'email', 'role', 'tel', 'username'],
