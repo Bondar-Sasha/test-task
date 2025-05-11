@@ -14,7 +14,6 @@ services:
          - mongo-db-data:/data/db
       networks:
          - nest-network
-
    redis:
       image: redis:latest
       working_dir: /data
@@ -59,8 +58,8 @@ services:
    express:
       restart: unless-stopped
       build:
-         context: ./microservices/expressApp
-         dockerfile: Dockerfile
+         context: .
+         dockerfile: ./microservices/expressApp/Dockerfile
       depends_on:
          - postgres-auth
          - postgres-common
@@ -73,8 +72,8 @@ services:
    nest:
       restart: unless-stopped
       build:
-         context: ./microservices/nest-app
-         dockerfile: Dockerfile
+         context: .
+         dockerfile: ./microservices/nest-app/Dockerfile
       depends_on:
          - express
       networks:

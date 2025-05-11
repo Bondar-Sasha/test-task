@@ -10,7 +10,6 @@ import { ConfigService } from '@nestjs/config'
          useFactory: (cfgService: ConfigService) => {
             return {
                uri: cfgService.get('MONGO_DB_URL'),
-
                autoIndex: cfgService.get('APP_MODE') === 'development',
             }
          },

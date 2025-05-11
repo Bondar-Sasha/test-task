@@ -32,6 +32,7 @@ export default {
                options: {
                   compilerOptions: {
                      declaration: false,
+                     transpileOnly: true,
                   },
                },
             },
