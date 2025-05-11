@@ -2,7 +2,7 @@ name: Docker Compose Deploy
 
 on:
    push:
-      branches: ['main']
+      branches: ['feature/auth']
    workflow_dispatch:
 
 jobs:
@@ -15,6 +15,7 @@ jobs:
          - name: Load .env.production file
            uses: falti/load-env-file@v1
            with:
+              context: root
               env-file: .env.production
 
          - name: Set up Docker Buildx
