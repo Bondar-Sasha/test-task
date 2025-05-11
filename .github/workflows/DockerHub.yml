@@ -13,13 +13,10 @@ jobs:
            uses: actions/checkout@v4
 
          - name: Load .env.production file
-           run: |
-              while read -r line || [[ -n "$line" ]]; do
-                if [[ $line != \#* ]] && [[ -n $line ]]; then
-                  echo "$line" >> $GITHUB_ENV
-                fi
-              done < .env.production
-           shell: bash
+           uses: falti/load-env-file@v1
+           with:
+              context: root
+              env-file: .env.production
 
          - name: Set up Docker Buildx
            uses: docker/setup-buildx-action@v2
