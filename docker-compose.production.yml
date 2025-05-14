@@ -12,6 +12,10 @@ services:
       restart: unless-stopped
       volumes:
          - mongo-db-data:/data/db
+      environment:
+         - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+         - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      command: ['mongod', '--port', '${MONGO_PORT}']
       networks:
          - nest-network
    redis:

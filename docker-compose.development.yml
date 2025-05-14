@@ -7,6 +7,11 @@ services:
          - '${MONGO_PORT}:${MONGO_PORT}'
       volumes:
          - mongo-db-data:/data/db
+      environment:
+         - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+         - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      command: ['mongod', '--port', '${MONGO_PORT}']
+
    redis:
       image: redis:latest
       working_dir: /data
