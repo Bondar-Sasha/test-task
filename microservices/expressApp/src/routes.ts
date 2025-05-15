@@ -77,7 +77,7 @@ router.post(
 router.get(
    baseAuthUrl + tokensValidationAndRefreshingRoute,
    universalTokenMiddleware(true) as RequestHandler,
-   localAuthController.tokensValidationAndRefresh,
+   localAuthController.tokensValidationAndRefresh as unknown as RequestHandler,
 )
 
 router.patch(

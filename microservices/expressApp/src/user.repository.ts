@@ -1,15 +1,25 @@
-import { Postgres } from '@test_task/shared/types'
+import { AuthPostgres } from '@test_task/shared/types'
 import { prismaClient } from '.'
 
-type UserSearchingCondition = { id: number }
+type UserSearchingCondition =
+   | {
+        id: number
+     }
+   | {
+        email: string
+     }
+   | {
+        username?: string
+     }
+
 class UserRepository {
    getUser(condition: UserSearchingCondition) {
-      return prismaClient.user.findUnique({ where: condition })
+      return prismaClient.user.findFirst({ where: condition })
    }
-   createUser(user: Postgres.MakeUserCredsSnapshot) {
+   createUser(user: AuthPostgres.MakeUserCredsSnapshot) {
       return prismaClient.user.create({ data: user })
    }
-   updateUser(id: number, user: Postgres.MakeUserCredsSnapshot) {
+   updateUser(id: number, user: AuthPostgres.UpdateUserCredsSnapshot) {
       return prismaClient.user.update({ where: { id }, data: user })
    }
    usersSoftDeleteTrigger() {

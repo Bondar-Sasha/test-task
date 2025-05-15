@@ -11,6 +11,7 @@ export namespace AuthTypes {
    }
    export interface AuthenticatedRequest extends Request {
       tokenData: TokensCreatingPayload
+      refresh_token: string
    }
 
    export interface LocalRegistrationRequest {
@@ -32,5 +33,11 @@ export namespace AuthTypes {
    export interface DeleteUserRequest {
       id: number
       soft_delete_date: Date
+   }
+
+   export interface TokensValidationAndRefreshRequest {
+      tel: string | null
+      username: string | null
+      email: string
    }
 }

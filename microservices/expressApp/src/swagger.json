@@ -142,6 +142,34 @@
          "get": {
             "tags": ["Auth"],
             "summary": "Validates and refreshes tokens (is user authorized)",
+            "description": "This endpoint is used to validate and refresh tokens.",
+            "response": {
+               "200": {
+                  "description": "Tokens refreshed successfully",
+                  "content": {
+                     "application/json": {
+                        "schema": {
+                           "tel": {
+                              "nullable": true,
+                              "type": "string"
+                           },
+                           "username": {
+                              "nullable": true,
+                              "type": "string"
+                           },
+                           "email": {
+                              "format": "email",
+                              "nullable": false,
+                              "type": "string"
+                           }
+                        }
+                     }
+                  }
+               },
+               "401": {
+                  "description": "Unauthorized"
+               }
+            },
             "security": [
                {
                   "bearerAuth": []
@@ -255,6 +283,51 @@
             "responses": {
                "302": {
                   "description": "Redirect to GitHub OAuth"
+               }
+            }
+         }
+      },
+      "/api/user-profile/delete/trigger": {
+         "delete": {
+            "tags": ["User delete"],
+            "summary": "Delete users with soft_delete_date older than 1 month",
+            "responses": {
+               "200": {
+                  "description": "Users deleted successfully"
+               }
+            }
+         }
+      },
+      "/api/user-profile/delete": {
+         "delete": {
+            "tags": ["User delete"],
+            "summary": "Soft delete user",
+            "requestBody": {
+               "required": true,
+               "content": {
+                  "application/json": {
+                     "schema": {
+                        "type": "object",
+                        "required": ["id", "soft_delete_date"],
+                        "properties": {
+                           "id": {
+                              "type": "integer"
+                           },
+                           "soft_delete_date": {
+                              "type": "string",
+                              "format": "date-time"
+                           }
+                        }
+                     }
+                  }
+               }
+            },
+            "responses": {
+               "200": {
+                  "description": "User deleted successfully"
+               },
+               "400": {
+                  "description": "Invalid request"
                }
             }
          }

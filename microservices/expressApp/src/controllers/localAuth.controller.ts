@@ -42,8 +42,13 @@ class LocalAuthController {
       res.clearCookie('access_token')
       res.json()
    }
-   tokensValidationAndRefresh(_req: Request, res: Response) {
-      res.json()
+   async tokensValidationAndRefresh(req: AuthTypes.AuthenticatedRequest, res: Response) {
+      const { refresh_token, access_token, email, tel, username } = await localAuthService.refreshTokens(
+         req.tokenData.userId,
+         req.refresh_token,
+      )
+      setTokensInCookies(res, access_token, refresh_token)
+      res.json({ email, tel, username })
    }
 }
 

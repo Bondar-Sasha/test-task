@@ -55,34 +55,34 @@ class GoogleAuthController {
             return done(ApiError.BadRequest('Email not provided by Google'))
          }
 
-         // const userFromDB = await userRepository.getUser({ email })
+         const userFromDB = await userRepository.getUser({ email })
 
          if (action === 'registration') {
-            // if (userFromDB) {
-            //    return done(ApiError.BadRequest('User with this email already exists'))
-            // }
+            if (userFromDB) {
+               return done(ApiError.BadRequest('User with this email already exists'))
+            }
             const dbRes = await userRepository.createUser({
-               // email,
+               email,
                provider: 'google',
                is_verified_email: true,
             })
             return done(null, tokensService.generateTokens({ userId: dbRes.id }))
          }
 
-         // if (!userFromDB) {
-         //    return done(ApiError.BadRequest('User with this email does not exist'))
-         // }
+         if (!userFromDB) {
+            return done(ApiError.BadRequest('User with this email does not exist'))
+         }
 
-         // if (userFromDB.provider !== 'google') {
-         //    return done(ApiError.BadRequest(`User account was created via ${userFromDB.provider} service`))
-         // }
+         if (userFromDB.provider !== 'google') {
+            return done(ApiError.BadRequest(`User account was created via ${userFromDB.provider} service`))
+         }
 
-         // const tokens = tokensService.generateTokens({ userId: userFromDB.id })
-         // await userRepository.updateUser(userFromDB.id, {
-         //    refresh_token: tokens.refresh_token,
-         // })
+         const tokens = tokensService.generateTokens({ userId: userFromDB.id })
+         await userRepository.updateUser(userFromDB.id, {
+            refresh_token: tokens.refresh_token,
+         })
 
-         // done(null, tokens)
+         done(null, tokens)
       } catch (error) {
          done(ApiError.ServerError())
       }

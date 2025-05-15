@@ -1,1 +1,1 @@
-export type { Postgres } from './Postgres'
+export type { AuthPostgres } from './AuthPostgres'

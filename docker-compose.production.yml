@@ -40,6 +40,7 @@ services:
          - POSTGRES_PORT=${AUTH_POSTGRES_PORT}
       volumes:
          - postgres-auth-data:/var/lib/postgresql/data
+         - ./auth-postgres-init.sql:/docker-entrypoint-initdb.d/auth-postgres-init.sql
       networks:
          - express-network
       command: ['postgres', '-p', '${AUTH_POSTGRES_PORT}']
