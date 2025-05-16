@@ -11,7 +11,7 @@
       "outDir": "./dist",
       "baseUrl": "src",
       "paths": {
-         "@test_task/shared/*": ["../../shared/*"],
+         "@test_task/shared/*": ["../../../shared/dist/*"],
          "@cfg": ["cfg/index"],
          "@utils": ["utils/index"]
       },

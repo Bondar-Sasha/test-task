@@ -1,19 +1,22 @@
 {
    "compilerOptions": {
-      "target": "ES2020",
+
       "module": "CommonJS",
-      "moduleResolution": "Node",
       "esModuleInterop": true,
+      "incremental": true,
       "strict": true,
+      "allowSyntheticDefaultImports": true,
+      "sourceMap": true,
+
       "skipLibCheck": true,
       "outDir": "./dist",
       "baseUrl": ".",
       "paths": {
          "src/*": ["./src/*"],
-         "@test_task/shared/*": ["../../shared/*"]
+         "@test_task/shared/*": ["../../shared/dist/*"]
       },
-      "rootDirs": ["./src", "../../shared"]
+      "rootDirs": ["./src", "../../shared/dist"]
    },
-   "include": ["src/**/*", "../../shared/**/*"],
+   "include": ["src/**/*", "../../shared/dist/**/*"],
    "exclude": ["node_modules", "dist"]
 }

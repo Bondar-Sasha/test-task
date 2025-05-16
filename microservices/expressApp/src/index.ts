@@ -8,7 +8,7 @@ import swaggerUi from 'swagger-ui-express'
 import { PrismaClient } from '../generated/prisma'
 import errorMiddleware from './middlewares/error.middleware'
 import envVars from './services/env.service'
-import { AppRoutes } from '@test_task/shared/routes'
+import  {AppRoutes} from '@test_task/shared/routes'
 import router from './routes'
 
 const app = express()

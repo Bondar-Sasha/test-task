@@ -10,7 +10,7 @@ import { RedirectResponse } from '../utils'
 import userRepository from '../user.repository'
 import emailService from './email.service'
 
-const { prefix, confirmEmailRoute } = AppRoutes.authRoutes()
+const { prefix, confirmEmailRoute } = AppRoutes.authRoutes
 
 const redisClient = new Redis(envVars.REDIS_AUTH_DB_URL)
 
@@ -30,7 +30,7 @@ class BasicAuthService {
    async login(email: string, password: string): Promise<RedirectResponse | AuthTypes.Tokens> {
       const user = await userRepository.getUser({ email })
 
-      if (!user) {
+      if (!user || user.soft_delete_date) {
          throw ApiError.BadRequest('User with this email does not exist')
       }
 

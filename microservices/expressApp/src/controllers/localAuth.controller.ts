@@ -1,11 +1,11 @@
 import { Request, Response } from 'express'
 import { baseAuthUrl, setTokensInCookies } from '../utils'
 import { AuthTypes } from '@test_task/shared/types'
-import { AppRoutes } from '@test_task/shared/routes'
+import  {AppRoutes}  from '@test_task/shared/routes'
 import localAuthService from '../services/localAuth.service'
 import { userWithTokensGuard } from 'src/utils/tokensGuard.guard'
 
-const { localLoginRoute } = AppRoutes.authRoutes()
+const { localLoginRoute } = AppRoutes.authRoutes
 
 class LocalAuthController {
    async registration(req: Request, res: Response) {

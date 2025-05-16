@@ -2,7 +2,7 @@ import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common'
 import { AppRoutes } from '@test_task/shared/routes'
 import { UserCredsRepository } from '../../db/postgres/repositories'
 
-const { prefix, getRoute } = AppRoutes.userProfileRoutes()
+const { prefix, getRoute } = AppRoutes.userProfileRoutes
 
 @Controller(prefix)
 export class UserProfileController {

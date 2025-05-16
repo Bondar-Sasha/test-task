@@ -19,6 +19,7 @@ model User {
   refresh_token     String?
   password          String?
   soft_delete_date  DateTime?
+  locked            Boolean?  @default(false)
 
   @@map("user")
 }

@@ -4,15 +4,13 @@
    "private": true,
    "description": "monorepo",
    "keywords": [],
+   "engines": {
+      "node": ">=22.15.1"
+   },
    "license": "ISC",
    "workspaces": [
       "microservices/*",
       "shared"
-   ],
-   "dependencies": {
-      "@nestjs/common": "^11.0.20",
-      "@nestjs/core": "^11.0.20",
-      "@nestjs/swagger": "^11.1.4",
-      "express": "^5.1.0"
-   }
+   ]
+
 }

@@ -1,17 +1,29 @@
 {
    "compilerOptions": {
-      "strict": true,
-      "target": "ESNext",
-      "moduleResolution": "node",
-      "esModuleInterop": true,
-      "allowSyntheticDefaultImports": true,
-      "forceConsistentCasingInFileNames": false,
-      "incremental": true,
-      "skipLibCheck": true,
-      "baseUrl": ".",
-      "rootDir": ".",
-      "module": "UMD",
-      "composite": true
+     "strict": true,
+     "esModuleInterop": true,
+     "allowSyntheticDefaultImports": true,
+     "forceConsistentCasingInFileNames": true, 
+     "incremental": true,
+     "skipLibCheck": true,
+     "baseUrl": ".",
+     "module": "ESNext",
+     "moduleResolution": "bundler",
+
+     "rootDir": ".",
+     "outDir": "./dist",
+     "declaration": true,
+     "composite": true,
+     "paths": {
+       "@routes/*": ["./routes/*"],
+       "@types/*": ["./types/*"]
+     }
    },
-   "include": ["**/*"]
-}
+   "include": ["**/*"], 
+   "exclude": [
+     "node_modules",
+     "dist",
+     "**/*.spec.ts", 
+     "**/*.test.ts"
+   ]
+ }

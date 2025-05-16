@@ -6,7 +6,7 @@ VOLUME /root/.npm
 COPY package.json package-lock.json ./
 COPY .env.production .env.production
 
-COPY ./shared ./shared
+COPY ./shared/dist ./shared/dist
 COPY ./microservices/expressApp/package.json ./microservices/expressApp/
 COPY ./microservices/expressApp/tsconfig.json ./microservices/expressApp/
 COPY ./microservices/expressApp/webpack.config.js ./microservices/expressApp/

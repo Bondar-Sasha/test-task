@@ -1,7 +1,7 @@
 import express, { RequestHandler } from 'express'
 import { body } from 'express-validator'
 import localAuthController from './controllers/localAuth.controller'
-import { AppRoutes } from '@test_task/shared/routes'
+import  {AppRoutes}  from '@test_task/shared/routes'
 import universalTokenMiddleware from './middlewares/universalToken.middleware'
 
 import { baseAuthUrl } from './utils'
@@ -25,9 +25,9 @@ const {
    githubCallbackRoute,
 
    resendCodeRoute,
-} = AppRoutes.authRoutes()
+} = AppRoutes.authRoutes
 
-const { deleteRoute, prefix, deleteTriggerRoute } = AppRoutes.userProfileRoutes()
+const { deleteRoute, prefix, deleteTriggerRoute } = AppRoutes.userProfileRoutes
 
 const router = express.Router()
 router.post(

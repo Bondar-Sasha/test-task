@@ -1,4 +1,4 @@
-export declare class AppRoutes {
+declare class AppRoutes {
     static backendPrefix: string;
     static authRoutes(): {
         prefix: string;
@@ -23,3 +23,4 @@ export declare class AppRoutes {
         deleteRoute: string;
     };
 }
+export { AppRoutes };

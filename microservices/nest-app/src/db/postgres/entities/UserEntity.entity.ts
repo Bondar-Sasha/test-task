@@ -1,5 +1,4 @@
 import { Entity, PrimaryGeneratedColumn, Column, Unique } from 'typeorm'
-import { Postgres } from '@test_task/shared/types'
 export enum Role {
    USER = 'user',
    ADMIN = 'admin',
@@ -19,35 +18,11 @@ export class UserEntity  {
    @PrimaryGeneratedColumn()
    id: number
 
-   @Column({ type: 'varchar', length: 255 })
-   email: string
-
-   @Column({
-      type: 'enum',
-      enum: Role,
-      default: Role.USER,
-   })
-   role: Role
-
-   @Column({
-      type: 'enum',
-      enum: Provider,
-      default: Provider.LOCAL,
-   })
-   provider: Provider
-
-   @Column({ type: 'boolean', default: false })
-   is_verified_email: boolean
-
-   @Column({ type: 'varchar', length: 20, nullable: true })
-   tel?: string
-
    @Column({ type: 'varchar', length: 255, nullable: true })
-   refresh_token?: string
+   nickname?: string
 
-   @Column({ type: 'varchar', length: 50, nullable: true })
-   username?: string
+   @Column({ type: 'timestamp', nullable: true })
+   soft_delete_date?: Date
 
-   @Column({ type: 'varchar', length: 255, nullable: true })
-   password?: string
+ 
 }

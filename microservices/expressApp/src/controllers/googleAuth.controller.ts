@@ -69,7 +69,7 @@ class GoogleAuthController {
             return done(null, tokensService.generateTokens({ userId: dbRes.id }))
          }
 
-         if (!userFromDB) {
+         if (!userFromDB || userFromDB.soft_delete_date) {
             return done(ApiError.BadRequest('User with this email does not exist'))
          }
 
