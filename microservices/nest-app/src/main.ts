@@ -1,49 +1,67 @@
-import { NestFactory } from '@nestjs/core'
+import { NestFactory, Reflector } from '@nestjs/core'
+import * as cookieParser from 'cookie-parser'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
-import { MicroserviceOptions, Transport } from '@nestjs/microservices'
-import { Logger } from '@nestjs/common'
+import { ClassSerializerInterceptor, Logger, ValidationPipe } from '@nestjs/common'
+import { json } from 'express'
+import { ConfigService } from '@nestjs/config'
 
 import { AppModule } from './app.module'
-import { EnvService } from '@cfg'
 import { HttpExceptionFilter } from '@utils'
 
 async function bootstrap() {
    const app = await NestFactory.create(AppModule)
 
-   const envService = app.get(EnvService)
+   const envService = app.get(ConfigService)
+   app.use(json())
+   app.use(cookieParser())
 
-   const { REDIS_USERNAME, REDIS_PASSWORD, REDIS_PORT, REDIS_HOST, REDIS_DB_NUM } = envService.getRedisCredentials()
+   app.useGlobalPipes(
+      new ValidationPipe({
+         transform: true,
+         whitelist: true,
+         transformOptions: {
+            excludeExtraneousValues: true,
+         },
+      }),
+   )
+   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector), { excludeExtraneousValues: true }))
 
    app.enableCors({
-      origin: [envService.getClientUrl()],
-      methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+      origin: [envService.get('CLIENT_URL')],
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       credentials: true,
    })
    const logger = new Logger()
 
    app.useGlobalFilters(new HttpExceptionFilter(logger))
 
-   app.connectMicroservice<MicroserviceOptions>({
-      transport: Transport.REDIS,
-      options: {
-         host: REDIS_HOST,
-         port: REDIS_PORT,
-         username: REDIS_USERNAME,
-         password: REDIS_PASSWORD,
-         db: REDIS_DB_NUM,
-      },
-   })
+   app.setGlobalPrefix('api')
 
-   const config = new DocumentBuilder()
-      .setTitle('App')
-      .setDescription('API description')
-      .setVersion('1.0')
-      .addTag('))')
-      .build()
+   if (envService.get('APP_MODE') === 'development') {
+      const config = new DocumentBuilder()
+         .setTitle('App')
+         .setDescription('API description')
+         .setVersion('1.0')
+         .addTag('Instagram App')
+         .build()
 
-   const documentFactory = () => SwaggerModule.createDocument(app, config)
-   SwaggerModule.setup('api', app, documentFactory)
+      const documentFactory = () => SwaggerModule.createDocument(app, config)
 
-   await Promise.all([app.startAllMicroservices(), app.listen(envService.getAppPort())])
+      const swaggerUIOptions = {
+         swaggerOptions: {
+            followRedirects: true,
+            redirectDepth: 5,
+            persistAuthorization: true,
+            displayRequestDuration: true,
+            filter: true,
+         },
+
+         customSiteTitle: 'App API Documentation',
+      }
+
+      SwaggerModule.setup('/api/docs', app, documentFactory, swaggerUIOptions)
+   }
+
+   await app.listen(envService.get<string>('NEST_APP_PORT')!)
 }
 void bootstrap()

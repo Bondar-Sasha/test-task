@@ -4,9 +4,13 @@
    "private": true,
    "description": "monorepo",
    "keywords": [],
+   "engines": {
+      "node": ">=22.15.1"
+   },
    "license": "ISC",
    "workspaces": [
       "microservices/*",
-      "types"
+      "shared"
    ]
+
 }

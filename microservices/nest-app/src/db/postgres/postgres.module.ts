@@ -1,32 +1,33 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 
-import { EnvService } from '@cfg'
-import { ConnectionService } from './connection/connection.service'
+import { UserEntity } from './entities'
+import { UserCredsRepository } from './repositories'
+import { ConfigService } from '@nestjs/config'
 
 @Module({
    imports: [
       TypeOrmModule.forRootAsync({
-         inject: [EnvService],
-         useFactory: (envService: EnvService) => {
-            const { POSTGRES_HOST, POSTGRES_PORT, POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB } =
-               envService.getPostgresCredentials()
+         inject: [ConfigService],
+         useFactory: (cfgService: ConfigService) => {
+            const isDev = cfgService.get('APP_MODE') === 'development'
 
             return {
                type: 'postgres',
-               host: POSTGRES_HOST,
-               port: POSTGRES_PORT,
-               username: POSTGRES_USER,
-               password: POSTGRES_PASSWORD,
-               database: POSTGRES_DB,
+               url: cfgService.get('COMMON_POSTGRES_DB_URL'),
                autoLoadEntities: true,
-               synchronize: envService.getAppMode() === 'development',
-               logging: envService.getAppMode() === 'development',
+               synchronize: isDev,
+               logging: isDev,
+               entities: [UserEntity],
+               retryAttempts: 1,
+               retryDelay: 3000,
+               keepConnectionAlive: false,
             }
          },
       }),
+      TypeOrmModule.forFeature([UserEntity]),
    ],
-   providers: [ConnectionService],
-   exports: [ConnectionService],
+   providers: [UserCredsRepository],
+   exports: [UserCredsRepository],
 })
 export class PostgresModule {}

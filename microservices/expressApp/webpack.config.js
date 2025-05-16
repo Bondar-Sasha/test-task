@@ -1,41 +1,62 @@
-import { resolve } from 'path'
+import path from 'path'
 import { fileURLToPath } from 'url'
-import { dirname } from 'path'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 export default {
    mode: 'production',
-   entry: './src/index.js',
    target: 'node',
+   entry: './src/index.ts',
+   experiments: {
+      outputModule: true,
+   },
+   externalsType: 'module',
+   externals: {
+      'node-gyp': 'module node-gyp',
+      npm: 'module npm',
+      'mock-aws-s3': 'module mock-aws-s3',
+      'aws-sdk': 'module aws-sdk',
+      nock: 'module nock',
+      bcrypt: 'module bcrypt',
+   },
+   externalsPresets: {
+      node: true,
+   },
+   module: {
+      rules: [
+         {
+            test: /\.ts$/,
+            use: {
+               loader: 'ts-loader',
+               options: {
+                  compilerOptions: {
+                     declaration: false,
+                     transpileOnly: true,
+                  },
+               },
+            },
+            exclude: /node_modules/,
+         },
+      ],
+   },
+   resolve: {
+      extensions: ['.ts', '.js', '.json'],
+      alias: {
+         src: path.resolve(__dirname, 'src'),
+         '@test_task/shared': path.resolve(__dirname, '../../shared'),
+      },
+   },
    output: {
       filename: 'index.mjs',
-      path: resolve(__dirname, 'dist'),
+      path: path.resolve(__dirname, 'dist'),
+      module: true,
       clean: true,
       library: {
          type: 'module',
       },
    },
-   experiments: {
-      outputModule: true,
+   optimization: {
+      minimize: false,
    },
-   resolve: {
-      extensions: ['.js'],
-   },
-   module: {
-      rules: [
-         {
-            test: /\.js$/,
-            exclude: /node_modules/,
-            use: {
-               loader: 'babel-loader',
-               options: {
-                  presets: ['@babel/preset-env'],
-               },
-            },
-         },
-      ],
-   },
-
-   externals: ['dotenv'],
 }

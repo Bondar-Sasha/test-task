@@ -1,24 +1,36 @@
 FROM node:18-alpine AS builder
 
 WORKDIR /app
+VOLUME /root/.npm
 
-COPY package.json ./
-COPY src ./src                    
-COPY webpack.config.js ./
+COPY package.json package-lock.json ./
+COPY .env.production .env.production
 
-RUN npm i
+COPY ./shared/dist ./shared/dist
+COPY ./microservices/expressApp/package.json ./microservices/expressApp/
+COPY ./microservices/expressApp/tsconfig.json ./microservices/expressApp/
+COPY ./microservices/expressApp/webpack.config.js ./microservices/expressApp/
+COPY ./microservices/expressApp/src ./microservices/expressApp/src
+COPY ./microservices/expressApp/prisma ./microservices/expressApp/prisma
+
+RUN npm ci --workspace=@microservices/expressapp --cache /root/.npm
+
+WORKDIR /app/microservices/expressApp
+
+RUN npx prisma generate
+RUN npm run prisma-migrate:deploy
 
 RUN npm run build
-
-RUN npm prune --omit=dev
 
 FROM node:18-alpine
 
 WORKDIR /app
 
+COPY --from=builder /app/microservices/expressApp/dist ./dist
+COPY --from=builder /app/microservices/expressApp/generated ./generated
+COPY --from=builder /app/microservices/expressApp/package.json ./package.json
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/dist ./dist
 
 EXPOSE $EXPRESS_APP_PORT
 
-CMD ["node", "dist/index.mjs"]
+CMD ["npm", "run", "prod"]
